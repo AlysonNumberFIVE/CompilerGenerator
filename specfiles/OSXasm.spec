@@ -72,5 +72,9 @@ pusha 		PUSHA
 ,			COLON
 popa 		POPA
 int 		INT
+[			OPENBRACKET
+]			CLOSEBRACKET
+
+
 
 
