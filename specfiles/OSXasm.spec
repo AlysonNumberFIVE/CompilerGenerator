@@ -16,25 +16,26 @@ gen_regs		[er][abcd]x
 small_regs		[abcd][lhx]
 push 			push(a)?
 pop 			pop(a)?
-str 			".*"
-chr 			'.*'
-comm 			;.*{newline}
+hex 			0[xX][a-fA-F0-9]+
+comment 		;.*{newline}
+string			".*"
+char			'.*'
 
 %%
 # delim
 
-; {comm}
-" {str}
-' {chr}
+; 		{comment}
+" 		{string}
+' 		{char}
+0[xX]	{hex}
+
 
 %%
 # tokenType
 
-{str}		STRING
-{chr}		CHAR
-{word}		ID
+{string}	STRING
+WORD		ID
 section 	SECTION
-global		GLOBAL
 extern 		EXTERN
 include 	INCLUDE
 _data		DATA
