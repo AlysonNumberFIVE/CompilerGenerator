@@ -1,12 +1,12 @@
 
 # Classifier
 
-alphabet		[A-Za-z_]
+alphabet		[_a-zA-Z]
 digit			[0-9]
 number			{digit}+
 newline			%NEWLINE
 word			{alphabet}({alphabet}|{digit})*
-symbols			[-+/\*&!\|\{\}=><:]
+symbols			[-+/\*&!\|\{\}=><:^;]
 equ             ([+-/=*!&\|]|((>)?>)|((<)?<))?=
 left            (<)?<
 right           (>)?>
@@ -15,13 +15,14 @@ comment 		//.*{newline}
 mcomment		/\*.*\*/
 float           [0-9]+((\.[0-9]*)|e((\+|-)?[0-9]+))
 hex             0[xX][a-fA-Z0-9]+
-char 			'.*'
+string			".*"
+char 			'[(\')(\t)(\n)]|(.*)'
 
 %%
 
 # Delim
-
-'		{char}
+'       {char}
+"		{string}
 //		{comment}
 /\*		{mcomment}
 
@@ -29,8 +30,10 @@ char 			'.*'
 
 # TokenType
 
+{string}		STRING
 {number}		INTEGER
 {word}			ID
+{char}			CH
 char			CHAR
 int				INT
 long			LONG
@@ -40,6 +43,9 @@ unsigned		UNSIGNED
 struct			STRUCT
 union			UNION
 << 				BITLEFT
+=				EQU
+<				LESSTHAN
+>				GREATER
 >> 				BITRIGHT
 >>=				BITRIGHT_EQU
 <<=				BITLEFT_EQU
@@ -49,6 +55,8 @@ union			UNION
 &				BIT_AND
 |				BIT_OR
 !				MPT
+do				DO
+for				FOR
 continue		CONTINUE
 while			WHILE
 if 				IF
@@ -67,22 +75,14 @@ short			SHORT
 else			ELSE
 case 			CASE
 :				COLON
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+->				DEREF_PTR
+...				ELIPSE
+?				QMARK
+.				DOT
+~				TILDE
+^				XOR
+^=				XOR_EQU
+return			RETURN
+NULL			NULLTOKEN
 
 
