@@ -6,7 +6,7 @@ digit			[0-9]
 number			{digit}+
 newline			%NEWLINE
 word			{alphabet}({alphabet}|{digit})*
-symbols			[-+/\*&!\|\{\}=><:^;]
+symbols			[-+/\*&!\|\{\}=><:^;,]
 equ             ([+-/=*!&\|]|((>)?>)|((<)?<))?=
 left            (<)?<
 right           (>)?>
@@ -17,6 +17,7 @@ float           [0-9]+((\.[0-9]*)|e((\+|-)?[0-9]+))
 hex             0[xX][a-fA-Z0-9]+
 string			".*"
 char 			'[(\')(\t)(\n)]|(.*)'
+arrow			->
 
 %%
 
@@ -75,7 +76,7 @@ short			SHORT
 else			ELSE
 case 			CASE
 :				COLON
-->				DEREF_PTR
+{arrow}			DEREF_PTR
 ...				ELIPSE
 ?				QMARK
 .				DOT

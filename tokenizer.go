@@ -33,7 +33,6 @@ func (s *tokenList)pushToken(name string, datatype string) {
 }
 
 func addDelimToken(value string, eval string) {
-	fmt.Println("eval is ", eval)
 	var index int
 
 	index = 0
