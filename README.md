@@ -1,7 +1,7 @@
 # CompilerGenerator
-The purpose of this repo is to store all the code for my current Medium project.<br><br>
+The purpose of this repo is to store all the code for my current Medium project.<br>
 
-This project, currently entitled Compiler Generator, is a series of project/articles covering my attempt at making a metacompiler from scratch in Golang, following along with the book <a href="">Engineering a Compiler</a>.<br><br>
+This project, currently entitled Compiler Generator, is a series of project/articles covering my attempt at making a metacompiler from scratch in Golang, following along with the book <a href="https://www.amazon.com/Engineering-Compiler-Keith-Cooper/dp/012088478X" blank_="" >Engineering a Compiler</a>.<br><br>
 
 ## Compiler Structure
 
