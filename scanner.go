@@ -14,7 +14,6 @@ var defaultVars 	map[string]string
 var gSymbolTable	map[string]string
 var newline 		string
 var regexList		map[string]string
-//var delimList		map[string][]string
 var delimList		map[string]string
 var tokenType 		map[string]string
 
@@ -28,7 +27,6 @@ func isASCII(c rune) bool {
 func handleASCIICode(value string) string {
 	var checker		strings.Builder
 	var toReturn	strings.Builder
-//	var tmp			strings.Builder
 
 	flag := false
 	for _, c := range value {
@@ -94,7 +92,6 @@ func readFile(filename string) string {
 
 func setupTargetList(config string, target string) {
 	var keyVal		[]string
-//	var delimItems 	[]string
 
 	segments := strings.Split(config, newline)
 	for _, segment := range segments {
@@ -111,11 +108,6 @@ func setupTargetList(config string, target string) {
 			regexList[keyVal[0]] = gSymbolTable[keyVal[0]]
 		} else if target == "delim" {
 			delimList[keyVal[0]] = handleVariable(keyVal[1])
-			/*
-			delimItems = append(delimItems, handleVariable(keyVal[1]))
-			delimItems = append(delimItems, handleVariable(keyVal[2]))
-			delimList[keyVal[0]] = delimItems
-			delimItems = []string{}*/
 		}
 	}
 }
@@ -186,7 +178,6 @@ func initGVars() {
 	defaultVars = make(map[string]string)
 	tokenType = make(map[string]string)
 	gSymbolTable = make(map[string]string)
-//	delimList = make(map[string][]string)
 	regexList = make(map[string]string)
 	delimList = make(map[string]string)
 
