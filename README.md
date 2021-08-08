@@ -86,7 +86,7 @@ A slight drawback with this format's design is the heavy reliance on regex knowl
 - Add functionality for error logging and reporting. This will be quite monolithic as this must span entire commpiler.
 - Complete unittesting
 - More reading for the Automated Parsing phase
-- Continuous testing (new cases in various languages keep coming up that need to be considered - Python \[fouri\]".*" strings not support and I don't know why) 
+- Continuous usability testing for spec file format
 
 
 
