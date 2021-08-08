@@ -88,6 +88,12 @@ A slight drawback with this format's design is the heavy reliance on regex knowl
 - More reading for the Automated Parsing phase
 - Resolve clashing tokens -- tokens like `{` and `}` and `#` that are integral to the functioning of the spec file's rules clash with languages that need `{` and `}` in their syntax.
 
+## A short demo
+
+Note: this demo's slow as I didn't realize until I'd done the work of extracting it and saving it that my mouse scrolling wasn't tracket (I forgot session recording works :'| ) so all the still/empty space is me scrolling... I'd recommend you give it a go if it looks interesting but this kinda gives you an idea of how it works anyway :).<br>
+<img src="https://github.com/AlysonBee/CompilerGenerator/blob/master/assets/demoScreen.gif" height="400"/>
+
+### Coded by Me! 
 
 
 
