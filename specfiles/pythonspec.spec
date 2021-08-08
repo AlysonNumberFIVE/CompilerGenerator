@@ -7,7 +7,7 @@ word			{alphabet}({alphabet}|{digit})*
 number			{digit}+
 float			[0-9]+((\.[0-9]*)|e((\+|-)?[0-9]+))
 indet 			%TAB
-symbols			[+-/=*!&\|\^@]
+symbols			[+-/=*!&\|\^@\.]
 equ				([+-/=*!&\|]|((>)?>)|((<)?<))?=
 left			(<)?<
 right			(>)?>
@@ -41,6 +41,7 @@ f"		 	{fstring}
 # TokenType
 # A list of all the tokens used in the language and their identifying type names.
 
+. 								DOT
 {fstring}						FSTRING
 {str2}							STRING
 {str}							STRING
