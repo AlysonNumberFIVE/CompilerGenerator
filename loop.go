@@ -7,61 +7,16 @@ import (
 	"io/ioutil"
 	"regexp"
 	"log"
+
 	stack "./stack"
 )
-/*
-type acceptingState struct {
-	pos		int
-	state 	string
-}
-
-type stack struct {
-	item []*acceptingState
-	height int
-}*/
 
 var dval 		string
 var delim 		bool
 var content		string
 var index 		int
 var stck 		*stack.Stack
-/*
-func initStack() *stack {
-	return &stack{
-		height: 0,
-	}
-}
 
-func (s *stack)push(pos int, currSstate string) {
-	item := &acceptingState{
-		pos: pos,
-		state: currSstate,
-	}
-	s.item = append(s.item, item)
-	s.height++
-}
-
-func (s *stack)pop() *acceptingState{
-	if s.height == 0 {
-		return nil
-	}
-	s.height--
-	toReturn := s.item[s.height]
-	s.item = s.item[:s.height]
-	return toReturn
-}
-
-func (s *stack)clear() {
-	s.item = []*acceptingState{}
-	s.height = 0
-}
-
-func (s *stack)print() {
-	for _, c := range s.item {
-		fmt.Printf("%d -> %s\n", c.pos, c.state)
-	}
-}
- */
 // nextChar advances the index into the source file while returning the current token
 func nextChar() string {
 	if index < len(content) {
