@@ -82,7 +82,10 @@ Each section of the spec file's data is laid out as follows:<br>
 A slight drawback with this format's design is the heavy reliance on regex knowledge to simulate the DFAs needed for the target language. An optional add-on will be an init file that auto-generates common regexes for common language constructs to speed up spec file development.
 
 
-
+## TODO
+- Add functionality for error logging and reporting. This will be quite monolithic as this must span entire commpiler.
+- Complete unittesting
+- More reading for the Automated Parsing phase
 
 
 
