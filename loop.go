@@ -61,6 +61,7 @@ func (s *stack)print() {
 	}
 }
 
+// nextChar advances the index into the source file while returning the current token
 func nextChar() string {
 	if index < len(content) {
 		c := string(content[index])
@@ -71,6 +72,7 @@ func nextChar() string {
 	return ""
 }
 
+// rollBack restores the index position and value of the last valid/accepted token.
 func rollBack() (string, int) { 
 	if stck.height > 0 {
 		value := stck.pop()
@@ -79,6 +81,7 @@ func rollBack() (string, int) {
 	return "", index
 }
 
+// evalRegex evaluates if a regex passes or not. A wrapper function for Go FindStringIndex.
 func evalRegex(currTok string, pattern string) bool {
 	match, _ := regexp.Compile(pattern)
 	test := match.FindStringIndex(currTok)
@@ -91,17 +94,9 @@ func evalRegex(currTok string, pattern string) bool {
 	return false
 }
 
-func regexPrefix(pattern string, currTok string) bool {
-	match, _ := regexp.Compile(pattern)
-	test := match.FindStringIndex(currTok)
-	if len(test) > 0 {
-		if test[0] == 0 && test[1] > 0 {
-			return true
-		}
-	}
-	return false
-}
-
+// vaildPrefix helps determine if currTok is a complete regex and, if not,
+// helps determine if it is at least a prefix to a longer regex to prevent premature
+// tokenization failure if it is a prefix.
 func validPrefix(currTok string) int {
 	for pattern := range delimList {
 		if evalRegex(currTok, pattern) == true {
@@ -122,6 +117,8 @@ func validPrefix(currTok string) int {
 	return -1
 }
 
+// scanDelimList is a helper function for singleToken and is to determine if a
+// token is the first part to a delimited token.
 func scanDelimList(currToken string) bool {
 	for k := range delimList {
 		if k == currToken || evalRegex(currToken, k) == true {
@@ -131,6 +128,7 @@ func scanDelimList(currToken string) bool {
 	return false
 }
 
+// singleToken is used to tokenize single tokens that aren't part of the delimited list
 func singleToken() {
 	var tmp 	string
 	var currTok strings.Builder 
@@ -163,6 +161,8 @@ func singleToken() {
 	addToken(currTok.String(), "")
 }
 
+// determinePattern determines which regex pattern findPattern falls under and
+// returns it. used in HandleDelim to determine which delim regex is to be applied 
 func determinePattern(findPattern string) string {
 	for pattern, ver := range delimList {
 		if pattern == findPattern {
