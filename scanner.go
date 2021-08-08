@@ -51,8 +51,7 @@ func handleASCIICode(value string) string {
 	return toReturn.String()
 }
 
-// handleVariable handles replacing variables with their contained values
-// 
+// handleVariable handles replacing variables with their contained values 
 func handleVariable(value string) string {
     var newVal		strings.Builder
     var toReturn	strings.Builder
@@ -74,7 +73,7 @@ func handleVariable(value string) string {
     return toReturn.String()
 }
 
-
+// skip skips over empty commented out lines.
 func skip(segment string) bool {
 	if len(segment) == 0 || strings.HasPrefix(segment, "#") == true {
 		return true
@@ -82,6 +81,7 @@ func skip(segment string) bool {
     return false
 }
 
+// readFile reads the contents of the source file.
 func readFile(filename string) string {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -90,6 +90,7 @@ func readFile(filename string) string {
 	return string(content)
 }
 
+// setupTargetList sets up the delim and regex tables from the spec file
 func setupTargetList(config string, target string) {
 	var keyVal		[]string
 
@@ -112,6 +113,7 @@ func setupTargetList(config string, target string) {
 	}
 }
 
+// setupTokens sets up the token type tables from the spec files
 func setupTokens(config string) {
 	var keyVal []string
 
@@ -128,32 +130,15 @@ func setupTokens(config string) {
 	}
 }
 
-func unpackConfig(config string) {
-
+// unpackSpec unpacks the spec files into the three tables
+func unpackSpec(config string) {
 	configs := strings.Split(config, "%%")
 	setupTargetList(configs[0], "regex")
 	setupTargetList(configs[1], "delim")
 	setupTokens(configs[2])
-
-	fmt.Println("regex list")
-	for k, v := range regexList	{
-		fmt.Printf("%s : %s\n", k, v)
-	}
-	fmt.Println("==============")
-	for k, v := range gSymbolTable {
-		fmt.Printf("%s : %s\n", k, v)
-	}
-	fmt.Println("==============")
-	for k, v := range delimList {
-		fmt.Printf("%s : %s\n", k, v)
-	}
-	fmt.Println("===============")
-	for k, v := range tokenType {
-		fmt.Printf("%s : %s\n", k, v)
-	}
 }
 
-
+// initConfig
 func initConfig() string {
 	var thisConfig []string
 
@@ -173,7 +158,8 @@ func initConfig() string {
 	os.Exit(3)
 	return ""
 }
-	
+
+// initGVars initializes all global variables
 func initGVars() {
 	defaultVars = make(map[string]string)
 	tokenType = make(map[string]string)
@@ -198,8 +184,9 @@ func main() {
 	configFile := initConfig()
 
 	config := readFile(configFile)
-	fmt.Println(config)
-	unpackConfig(config)
+
+	unpackSpec(config)
+	
 	scan(os.Args[1])
 }
 

@@ -33,8 +33,11 @@ char			'.*'
 %%
 # tokenType
 
+{number}	INTEGER
+{hex}		INTEGER
+syscall 	SYSCALL
 {string}	STRING
-WORD		ID
+{word}		ID
 section 	SECTION
 extern 		EXTERN
 include 	INCLUDE

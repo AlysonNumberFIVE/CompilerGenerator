@@ -24,9 +24,7 @@ var delim 		bool
 var content		string
 var index 		int
 var stck 		*stack
-
 var n 			bool
-var numPrefix	map[string]string
 
 func initStack() *stack {
 	return &stack{
@@ -106,10 +104,8 @@ func regexPrefix(pattern string, currTok string) bool {
 }
 
 func validPrefix(currTok string) int {
-	fmt.Println("currTok ", currTok)
 	for pattern := range delimList {
 		if evalRegex(currTok, pattern) == true {
-			fmt.Printf("currTok %s - pattern %s\n", currTok, pattern)
 			return 1
 		}
 	}
@@ -153,25 +149,15 @@ func singleToken() {
 		if checker == 1 {
 			stck.push(index, currTok.String())
 		} else if checker == -1 {
-
 			tmp, index = rollBack()
 			currTok.Reset()
 			currTok.WriteString(tmp)
-			fmt.Println(">>>>>>>>> ", currTok.String())
 			break
 		}
 	}
-	fmt.Println(">>", currTok.String())
 	stck.clear()
 	if scanDelimList(currTok.String()) == true {
 		stck.push(index, currTok.String())
-		for k := range numPrefix {
-			if currTok.String() == k {
-				n = true
-				fmt.Println("N is true and currTok is ", currTok.String())
-				return 
-			}
-		}
 		delim = true
 		return 
 	}
@@ -187,15 +173,7 @@ func determinePattern(findPattern string) string {
 	return ""
 }
 
-func determineNumFormat(pattern string) string {
-	for k, v := range numPrefix {
-		if pattern == k {
-			return v
-		}
-	}
-	return ""
-}
-
+// handle 
 func handleNum() {
 	var pattern  	string
 	var totalTok	strings.Builder
@@ -218,8 +196,10 @@ func handleNum() {
 		}
 	}
 	n = false
+	addToken(totalTok.String(), eval)
 }
 
+// handleDelim is responsible for handling the tokenizing of delimiter based tokens
 func handleDelim() {
 	var totalTok strings.Builder
 	var c 		 string
@@ -234,16 +214,16 @@ func handleDelim() {
 			break 
 		}
 		totalTok.WriteString(c)
-		fmt.Println(">> ", totalTok.String())
 		if evalRegex(totalTok.String(), eval) == true {
 			break
 		}
 	}
-	fmt.Println("totalTok ", totalTok.String())
 	addDelimToken(totalTok.String(), eval)
 	delim = false
 }
 
+// initScanner initializes scanner specific variables; the source code file(s),
+// an empty token list and empty accepting state stack
 func initScanner(filename string) {
 	tmp, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -253,15 +233,10 @@ func initScanner(filename string) {
 	content = string(tmp)
 	stck = initStack()
 	index = 0
-
 	n = false
-	// to delete
-	numPrefix = make(map[string]string)
-	numPrefix["0x"] = "0[x][a-fA-F0-9]+"
-	numPrefix["0o"] = "0[o][0-8]+"
-	numPrefix["0b"] = "0[b][0-1]+"
 }
 
+// scan is the main loop that passes over the source code file input
 func scan(filename string) {
 
 	initScanner(filename)
@@ -275,9 +250,11 @@ func scan(filename string) {
 		if delim == true {
 			handleDelim()
 		}
+		/*
 		if n == true {
+			fmt.Println("handlng numbers ")
 			handleNum()
-		}
+		}*/
 	}
 	tokens.listTokens()
 }

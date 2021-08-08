@@ -16,12 +16,15 @@ type tokenList struct {
 	height 		int
 }
 
+// initTokenList initializes a token list struct
 func initTokenList() *tokenList {
 	return &tokenList{}
 }
 
+// global tokens list
 var tokens *tokenList
 
+// push token adds a token to the overall token list
 func (s *tokenList)pushToken(name string, datatype string) {
 	item := &token{
 		line: 0,
@@ -32,6 +35,7 @@ func (s *tokenList)pushToken(name string, datatype string) {
 	s.height++ 
 }
 
+// addDelimToken adds tokens in the delim list to the token list
 func addDelimToken(value string, eval string) {
 	var index int
 
@@ -49,6 +53,7 @@ func addDelimToken(value string, eval string) {
 	}
 }
 
+// addToken adds a token to the token list
 func addToken(value string, datatype string) {
 	if len(datatype) > 0 && len(value) > 0 {
 		tokens.pushToken(value, datatype)
@@ -70,6 +75,7 @@ func addToken(value string, datatype string) {
 	}
 }
 
+// ListTokens prints a list of all saved tokens
 func (s *tokenList)listTokens() {
 	for _, token := range s.tList {
 		if len(token.name) == 0 {
