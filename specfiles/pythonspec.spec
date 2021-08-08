@@ -34,7 +34,7 @@ hex 			0[xX][a-fA-Z0-9]+
 ' 			{str2}
 " 			{str}
 0[xX]		{hex}
-[fouri]" 	{fstring}
+f"		 	{fstring}
 
 %%
 
@@ -51,7 +51,7 @@ False							FALSE
 {number}   						INTEGER
 :								COLON
 {float}							FLOAT
-( 								OPENBRACE
+( 								O PENBRACE
 ) 								CLOSEBRACE
 [								OPENBRACKET
 ]								CLOSEBRACKET
