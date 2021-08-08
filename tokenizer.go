@@ -5,12 +5,14 @@ import (
 	"fmt"
 )
 
+// token is a struct for each token. line value to be preserved for multi-source file support.
 type token struct {
 	line 		int
 	name		string
 	datatype	string
 }
 
+// tokenList is a list that holds all tokens in the source file.
 type tokenList struct {
 	tList 		[]*token
 	height 		int

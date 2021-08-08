@@ -33,6 +33,7 @@ char			'.*'
 %%
 # tokenType
 
+{label}		LABEL
 {number}	INTEGER
 {hex}		INTEGER
 syscall 	SYSCALL
