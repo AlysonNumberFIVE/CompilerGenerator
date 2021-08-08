@@ -6,7 +6,9 @@ digit			[0-9]
 number			{digit}+
 newline			%NEWLINE
 word			{alphabet}({alphabet}|{digit})*
-symbols			[-+/\*&!\|\{\}=><:^;,]
+symbols			[-+/\*&!\|=><:^;,]
+lbrace 			%LBRC
+rbrace 			%RBRC
 equ             ([+-/=*!&\|]|((>)?>)|((<)?<))?=
 left            (<)?<
 right           (>)?>
@@ -63,8 +65,8 @@ while			WHILE
 if 				IF
 (				OPENBRACE
 )				CLOSEBRACE
-{				OPENCURLY
-}				CLOSECURLY
+{lbrace}		OPENCURLY
+{rbrace}		CLOSECURLY
 [				OPENBRACKET
 ]				CLOSEBRACKET
 ,				COMMA
@@ -85,5 +87,4 @@ case 			CASE
 ^=				XOR_EQU
 return			RETURN
 NULL			NULLTOKEN
-
 

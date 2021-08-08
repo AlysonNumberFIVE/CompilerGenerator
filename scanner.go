@@ -39,8 +39,9 @@ func handleASCIICode(value string) string {
 			if _, exists := defaultVars[checker.String()]; exists {
 				toReturn.WriteString(defaultVars[checker.String()])
 			} else {
+
 				fmt.Printf("Warning : default variable %s doesn't exist\n", checker.String())
-				return ""
+				return value
 			}
 			checker.Reset()
 		}
@@ -100,15 +101,16 @@ func setupTargetList(config string, target string) {
 			continue 
 		}
 		keyVal = strings.Fields(segment)
-
+		
+		keyVal[1] = handleVariable(keyVal[1])
 		if len(keyVal[1]) > 0 && keyVal[1][0] == '%' {
 			keyVal[1] = handleASCIICode(keyVal[1])
 		}
-		gSymbolTable[keyVal[0]] = handleVariable(keyVal[1])
+		gSymbolTable[keyVal[0]] = keyVal[1]
 		if target == "regex" {
 			regexList[keyVal[0]] = gSymbolTable[keyVal[0]]
 		} else if target == "delim" {
-			delimList[keyVal[0]] = handleVariable(keyVal[1])
+			delimList[keyVal[0]] = keyVal[1]
 		}
 	}
 }
@@ -170,6 +172,8 @@ func initGVars() {
 	defaultVars["NEWLINE"] = "\n"
 	defaultVars["TAB"] = "\t"	
 	defaultVars["PC"] = "%"
+	defaultVars["LBRC"] = "{"
+	defaultVars["RBRC"] = "}"
 
 	if runtime.GOOS == "windows" {
 		newline = "\r\n"

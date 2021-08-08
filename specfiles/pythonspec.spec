@@ -52,7 +52,7 @@ False							FALSE
 {number}   						INTEGER
 :								COLON
 {float}							FLOAT
-( 								O PENBRACE
+( 								OPENBRACE
 ) 								CLOSEBRACE
 [								OPENBRACKET
 ]								CLOSEBRACKET
