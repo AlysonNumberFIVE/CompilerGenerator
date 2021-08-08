@@ -86,7 +86,7 @@ A slight drawback with this format's design is the heavy reliance on regex knowl
 - Add functionality for error logging and reporting. This will be quite monolithic as this must span entire commpiler.
 - Complete unittesting
 - More reading for the Automated Parsing phase
-- Resolve clashing tokens -- tokens like `{` and `}` and `#` that are integral to the functioning of the spec file's rules clash with languages that need `{` and `}` in their syntax.
+- Resolve clashing tokens -- IN TESTING
 
 ## A short demo
 
