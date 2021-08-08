@@ -24,7 +24,6 @@ var delim 		bool
 var content		string
 var index 		int
 var stck 		*stack
-var n 			bool
 
 func initStack() *stack {
 	return &stack{
@@ -173,32 +172,6 @@ func determinePattern(findPattern string) string {
 	return ""
 }
 
-// handle 
-func handleNum() {
-	var pattern  	string
-	var totalTok	strings.Builder
-	var c 			string
-
-	pattern, index = rollBack()
-	eval := determinePattern(pattern)
-	totalTok.WriteString(pattern)
-	for {
-		c = nextChar()
-		if len(c) == 0 {
-			break
-		}
-		totalTok.WriteString(c)
-		if evalRegex(totalTok.String(), eval) == true {
-			stck.push(index, totalTok.String())
-		} else {
-			fmt.Println("$> ", totalTok.String())
-			break
-		}
-	}
-	n = false
-	addToken(totalTok.String(), eval)
-}
-
 // handleDelim is responsible for handling the tokenizing of delimiter based tokens
 func handleDelim() {
 	var totalTok strings.Builder
@@ -233,14 +206,11 @@ func initScanner(filename string) {
 	content = string(tmp)
 	stck = initStack()
 	index = 0
-	n = false
 }
 
 // scan is the main loop that passes over the source code file input
 func scan(filename string) {
-
 	initScanner(filename)
-
 	for {
 		if index >= len(content) {
 			break
@@ -250,11 +220,6 @@ func scan(filename string) {
 		if delim == true {
 			handleDelim()
 		}
-		/*
-		if n == true {
-			fmt.Println("handlng numbers ")
-			handleNum()
-		}*/
 	}
 	tokens.listTokens()
 }
