@@ -7,8 +7,9 @@ import (
 	"io/ioutil"
 	"regexp"
 	"log"
+	stack "./stack"
 )
-
+/*
 type acceptingState struct {
 	pos		int
 	state 	string
@@ -17,14 +18,14 @@ type acceptingState struct {
 type stack struct {
 	item []*acceptingState
 	height int
-}
+}*/
 
 var dval 		string
 var delim 		bool
 var content		string
 var index 		int
-var stck 		*stack
-
+var stck 		*stack.Stack
+/*
 func initStack() *stack {
 	return &stack{
 		height: 0,
@@ -60,7 +61,7 @@ func (s *stack)print() {
 		fmt.Printf("%d -> %s\n", c.pos, c.state)
 	}
 }
-
+ */
 // nextChar advances the index into the source file while returning the current token
 func nextChar() string {
 	if index < len(content) {
@@ -74,9 +75,9 @@ func nextChar() string {
 
 // rollBack restores the index position and value of the last valid/accepted token.
 func rollBack() (string, int) { 
-	if stck.height > 0 {
-		value := stck.pop()
-		return value.state, value.pos
+	if stck.Height > 0 {
+		value := stck.Pop()
+		return value.State, value.Pos
 	}
 	return "", index
 }
@@ -144,7 +145,7 @@ func singleToken() {
 		currTok.WriteString(c)
 		checker = validPrefix(currTok.String())
 		if checker == 1 {
-			stck.push(index, currTok.String())
+			stck.Push(index, currTok.String())
 		} else if checker == -1 {
 			tmp, index = rollBack()
 			currTok.Reset()
@@ -152,9 +153,9 @@ func singleToken() {
 			break
 		}
 	}
-	stck.clear()
+	stck.Clear()
 	if scanDelimList(currTok.String()) == true {
-		stck.push(index, currTok.String())
+		stck.Push(index, currTok.String())
 		delim = true
 		return 
 	}
@@ -204,7 +205,7 @@ func initScanner(filename string) {
 	}
 	tokens = initTokenList()
 	content = string(tmp)
-	stck = initStack()
+	stck = stack.InitStack()
 	index = 0
 }
 
