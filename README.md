@@ -133,12 +133,11 @@ Example:
 ```
 ./compiler --outfile [filename] 
 ```
-The above will dump all tokens into an output file with the filename `[filename]`.<br><br>
 3. A default `init` option for spec file creation that will initialize an empty spec file with all common regex patterns already set.<br>
 Example:
 ```
 $>./compiler --init-spec
-$># Classifier 
+# Classifier 
 
 alphabet                [_a-zA-Z]
 digit                   [0-9]
