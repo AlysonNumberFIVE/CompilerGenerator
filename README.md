@@ -3,6 +3,17 @@ The purpose of this repo is to store all the code for my current <a href="https:
 
 This project, currently entitled Compiler Generator, is a series of project/articles covering my attempt at making a metacompiler from scratch in Golang, following along with the book <a href="https://www.amazon.com/Engineering-Compiler-Keith-Cooper/dp/012088478X" blank_="" >Engineering a Compiler</a>.<br><br>
 
+## Table of Contents
+  - <b>Compiler Structure</b>
+  - <b>Progress so Far</b>
+      - <b>The Scanner</b>
+      - <b>Spec File Format</b>
+      - <b>IMPORTANT: Controlling spec syntax tokens clashing with target language</b>
+  - <b>TODO</b>
+  - <b>A short demo</b>
+  - <b>How to run it</b>
+       - <b>Changes to Execution on the way</b>
+
 ## Compiler Structure
 
 This project is divided into three parts;
