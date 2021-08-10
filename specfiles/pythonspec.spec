@@ -17,7 +17,7 @@ newline 		%NEWLINE
 str 			".*"
 str2 			'.*'
 mcomm 			'''.*'''
-mcomm2 			""".*"""
+mcomm2 			"""(.|{newline})*"""
 fstring 		[fouri]".*"
 hex 			0[xX][a-fA-Z0-9]+
 

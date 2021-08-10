@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"log"
 
-	stack "./stack"
+	stack "github.com/AlysonBee/CompilerGenerator/stack"
 )
 
 var dval 		string
