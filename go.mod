@@ -1,4 +1,4 @@
-module test
+module compiler
 
 go 1.16
 
