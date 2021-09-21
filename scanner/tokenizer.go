@@ -2,7 +2,10 @@
 package main
 
 import (
+	"os"
 	"fmt"
+	"log"
+	"strings"
 )
 
 // token is a struct for each token. line value to be preserved for multi-source file support.
@@ -77,12 +80,39 @@ func addToken(value string, datatype string) {
 	}
 }
 
+// writeFile writes the content of content to a token file.
+func writeFile(content string) {
+	f, err := os.Create("genericTokenFile.tk")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = f.WriteString(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("file written!")
+}
+
 // ListTokens prints a list of all saved tokens
 func (s *tokenList)listTokens() {
+	var fileBuffer strings.Builder
+
 	for _, token := range s.tList {
 		if len(token.name) == 0 {
 			continue
 		}
+		fileBuffer.WriteString(token.name)
+		fileBuffer.WriteString(":")
+		fileBuffer.WriteString(token.datatype)
+		fileBuffer.WriteString("\n")
 		fmt.Printf("name : %s  type : %s\n", token.name, token.datatype)
 	}
+	writeFile(fileBuffer.String())
 }
+
+
+
+
+
