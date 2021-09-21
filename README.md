@@ -3,6 +3,17 @@ The purpose of this repo is to store all the code for my current <a href="https:
 
 This project, currently entitled Compiler Generator, is a series of project/articles covering my attempt at making a metacompiler from scratch in Golang, following along with the book <a href="https://www.amazon.com/Engineering-Compiler-Keith-Cooper/dp/012088478X" blank_="" >Engineering a Compiler</a>.<br><br>
 
+## Table of Contents
+  - <b>Compiler Structure</b>
+  - <b>Progress so Far</b>
+      - <b>The Scanner</b>
+      - <b>Spec File Format</b>
+      - <b>IMPORTANT: Controlling spec syntax tokens clashing with target language</b>
+  - <b>TODO</b>
+  - <b>A short demo</b>
+  - <b>How to run it</b>
+       - <b>Changes to Execution on the way</b>
+
 ## Compiler Structure
 
 This project is divided into three parts;
@@ -105,6 +116,70 @@ Should you need to define `\n` or `\t` as part of your language's spec, use thes
 
 Note: this demo's slow as I didn't realize until I'd done the work of extracting it and saving it that my mouse scrolling wasn't tracket (I forgot session recording works :'| ) so all the still/empty space is me scrolling... I'd recommend you give it a go if it looks interesting but this kinda gives you an idea of how it works anyway :).<br><br>
 <img src="https://github.com/AlysonBee/CompilerGenerator/blob/master/assets/demoScreen.gif" height="400"/>
+
+## How to run it
+
+Start by compiling the project
+```
+go build .
+```
+Then, set your spec file in the `config` file. Current spec (for demo purposes) can be found in `./specfiles`.<br><br>
+Inside `config`
+```
+config:[specfile path]
+```
+And then run the scanner against a target source file
+```
+./compiler [source file]
+```
+#### Changes to Execution on the way
+
+1. The option of passing in a config spec file will be added as a command line parameter<br>
+Example:
+```
+./compiler --config [spec file]
+```
+2. The option to output a token file with all your tokenized values with a commmand line parameter<br>
+Example:
+```
+./compiler --outfile [filename] 
+```
+3. A default `init` option for spec file creation that will initialize an empty spec file with all common regex patterns already set.<br>
+Example:
+```
+$>./compiler --init-spec
+# Classifier 
+
+alphabet                [_a-zA-Z]
+digit                   [0-9]
+number                  {digit}+
+newline                 %NEWLINE
+word                    {alphabet}({alphabet}|{digit})*
+symbols                 [-+/\*&!\|=><:^;,]
+lbrace                  %LBRC
+rbrace                  %RBRC
+equ                     ([+-/=*!&\|]|((>)?>)|((<)?<))?=
+left                    (<)?<
+right                   (>)?>
+brackets                [\[\]\(\)]
+float                   [0-9]+((\.[0-9]*)|e((\+|-)?[0-9]+))
+hex                     0[xX][a-fA-Z0-9]+
+string                  ".*"
+char                    '[(\')(\t)(\n)]|(.*)'
+
+%%
+
+# Delims
+'       {char}
+"       {string}
+0[xX]   {hex}
+
+%%
+# TokenType
+
+# tokens go here
+$>
+```
 
 #### Coded extensively by AlysonBee (Alyson Ngonyama) 
 
