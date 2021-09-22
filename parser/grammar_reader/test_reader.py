@@ -69,10 +69,9 @@ class MakeProductionsTestCases(object):
 
 
 def assert_language_object(expected: reader.Language,
-							actual: reader.Language) -> bool:
+	actual: reader.Language) -> bool:
 	
-
-
+	
 
 def test_make_production():
 

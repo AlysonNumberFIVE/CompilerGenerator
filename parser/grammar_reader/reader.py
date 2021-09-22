@@ -28,11 +28,16 @@ class Language:
 		self.derivNum = derivNum
 		self.grammarDescription = grammarDescription
 		self.stringValue = stringValue
+
+		self.TEST_Duplicates = [] 
+		self.TEST_Len = len(grammarDescription)
+
 		if self.terminal == self.nonterminal:
 			print("Error : token cannot be both a term and a nonterm")
 			sys.exit(1)
 
 	def string(self):
+
 		return "grammarName: " + self.grammarName + "\n derivNum: " + str(self.derivNum) \
 			+ "\ngrammarDescription: " + str(self.grammarDescription)
 
@@ -65,6 +70,7 @@ def make_terminal(terminal: str) -> Language:
 		terminal=True, derivNum=-1,
 		grammarDescription=[] 	
 	)
+
 	return lang
 
 
@@ -82,6 +88,7 @@ def make_productions(rule: str, nonterminals: list) -> list:
 	
 	if production not in nonterminals:
 		print(f"Error : production rule {production} is not a nonterminal")
+		
 		return []
 
 	# checking for multiple derivatives
@@ -91,7 +98,6 @@ def make_productions(rule: str, nonterminals: list) -> list:
 		deriv_number = 0
 		for subrule in ruleset:
 			grammar = subrule.split()
-			production = production + str(deriv_number) if deriv_number	> 0 else production
 			lang = Language(
 				grammarName=production,
 				nonterminal=True,derivNum=deriv_number,
@@ -110,6 +116,16 @@ def make_productions(rule: str, nonterminals: list) -> list:
 	language_list.append(lang)
 
 	return language_list
+
+
+def tag_unique_grammar_names(nonterm_list: list):
+
+	for i, nonterm in zip(range(0, len(nonterm_list) - 1), nonterm_list):
+		if nonterm.derivNum	> 0:
+			nonterm_list[i].grammarName += str(nonterm.derivNum)
+
+	return nonterm_list
+
 
 
 def extract_terminals_and_nonterminals(grammar: str):
@@ -145,20 +161,36 @@ def extract_terminals_and_nonterminals(grammar: str):
 	return terminals, nonterminals
 
 
-
 def search_nonterm_list(nonterm_list: list, to_find: str) -> list:
+	"""This scans through the nonterminal's derivations for tokens
+	that have more than 1 derivation and expands them.
+
+	:param: nonterm_list: The list of nonterminals to scan through.
+	:param: to_find: The nonterminal to be searched for.
+	:return The expanded list of tokens.
+	"""
 	nonterm_names = list()
 	for nonterm in nonterm_list:
-
 		if to_find == nonterm.grammarName:
 			if nonterm.derivNum > 0:
 				name = to_find + str(nonterm.derivNum)
-				nonterm_names.append(name)
-
+			else:
+				name = to_find
+			nonterm_names.append(name)
 	return nonterm_names
 
 
 def expand_production_list(nonterm_list: list, nonterminals: list) -> list:
+	"""This finds all the tokens in every nonterminal object that derives tokens
+	which, themselves, have multiple derivations and expands these tokens.
+
+	If a nonterminal derives a token "test" and test is a nonterminal that
+		has 2 derivations, then "test" will be expanded to "test" and "test1".
+
+	:param: nonterm_list: The list of nonterminals to scan through.
+	:param: nonterminals: The list of all nonterminals in the target grammar.
+	:return: A nonterm_list with expanded grammar tokens.
+	"""
 
 	for i, nonterm in zip(range(0, len(nonterm_list)), nonterm_list):
 		for j, token in zip(range(0, len(nonterm.grammarDescription)),\
@@ -170,7 +202,9 @@ def expand_production_list(nonterm_list: list, nonterminals: list) -> list:
 				second = nonterm_list[i].grammarDescription[j:]
 				nonterm_list[i].grammarDescription = first + \
 					derivation_list + second
+				nonterm_list[i].TEST_Duplicates = derivation_list
 				break 
+
 	return nonterm_list
 
 
@@ -191,6 +225,8 @@ def parse_grammar_file(grammar: str) -> Language:
 		term_list.append(make_terminal(terminal))
 
 	nonterm_list = expand_production_list(nonterm_list, nonterminals)
+
+	nonterm_list = tag_unique_grammar_names(nonterm_list)
 
 	for nonterm in nonterm_list:
 		print(nonterm.string())

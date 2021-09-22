@@ -9,13 +9,15 @@ import welder.templates
 ENV = Environment(
 	loader=FileSystemLoader(next(iter(welder.templates.__path__)))
 )
+ENV.globals.update(zip=zip)
 
 
 def generate_grammar(grammar: str): 
 
 	terminals, nonterminals, nonterm_list, term_list = \
 		reader.parse_grammar_file(grammar)
-
+	for nonterm in nonterm_list:
+		print("duplicates are ", nonterm.TEST_Duplicates)
 
 	fd = open('test2.c', 'w')
 	content = str()
@@ -27,6 +29,12 @@ def generate_grammar(grammar: str):
 	template = ENV.get_template("nonterminal_lib.jinja")
 	print(template.render(nonterminals=nonterm_list))
 	content += template.render(nonterminals=nonterm_list)
+
+	template = ENV.get_template("functions.jinja")
+	print(template.render(nonterminals=nonterm_list))
+
+
+
 	fd.write(content)
 	fd.close()
 
