@@ -91,6 +91,7 @@ def make_productions(rule: str, nonterminals: list) -> list:
 		deriv_number = 0
 		for subrule in ruleset:
 			grammar = subrule.split()
+			production = production + str(deriv_number) if deriv_number	> 0 else production
 			lang = Language(
 				grammarName=production,
 				nonterminal=True,derivNum=deriv_number,
@@ -150,8 +151,9 @@ def search_nonterm_list(nonterm_list: list, to_find: str) -> list:
 	for nonterm in nonterm_list:
 
 		if to_find == nonterm.grammarName:
-			name = to_find + str(nonterm.derivNum)
-			nonterm_names.append(name)
+			if nonterm.derivNum > 0:
+				name = to_find + str(nonterm.derivNum)
+				nonterm_names.append(name)
 
 	return nonterm_names
 
@@ -165,7 +167,7 @@ def expand_production_list(nonterm_list: list, nonterminals: list) -> list:
 			if token in nonterminals:
 				derivation_list = search_nonterm_list(nonterm_list, token)
 				first = nonterm_list[i].grammarDescription[:j] 
-				second = nonterm_list[i].grammarDescription[j+1:]
+				second = nonterm_list[i].grammarDescription[j:]
 				nonterm_list[i].grammarDescription = first + \
 					derivation_list + second
 				break 

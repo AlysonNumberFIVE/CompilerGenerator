@@ -23,7 +23,8 @@ typedef struct	s_{{ term.grammarName }} {
 	char 		*name;
 	metaData 	*metadata;
 	int 		deriv_number;
-	errormsg 	*error_msg;
+	void		*prev;
+	errormsg 	*error;
 }	t_{{ term.grammarName }};
 
 t_{{ term.grammarName }} *init_term_{{ term.grammarName }}() {
@@ -32,7 +33,7 @@ t_{{ term.grammarName }} *init_term_{{ term.grammarName }}() {
 	new_term->name = strdup("{{ term.stringValue}}");
 	new_term->metadata = (metaData *)malloc(sizeof(metaData));
 	new_term->deriv_number = {{ term.derivNum }};
-	new_term->error_msg = (errormsg *)malloc(sizeof(errormsg));
+	new_term->error = (errormsg *)malloc(sizeof(errormsg));
 	return (new_term);
 }
 {% endfor %}

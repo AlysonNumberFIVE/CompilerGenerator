@@ -2,41 +2,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-{% for nonterm in nonterminals %}
-	
-typedef struct s_{{ nonterm.grammarName }}{% if nonterm.derivNum > 0 %}{{ nonterm.derivNum }}{% endif %} {
+{% for nonterm in nonterminals %}	
+typedef struct s_{{ nonterm.grammarName }} {
 	char 		*name;
 	metaData	*metadata;
 	int 		deriv_number;
+	errormsg	*error;
+	void		*prev;
 
-	{% for descrip in nonterm.grammarDescription %}
-		{%- if descrip[-1] == "0" %}
-	t_{{ descrip[:-1] }} *_{{ descrip[:-1] }};
-		{%- else %}
-	t_{{ descrip }} *_{{ descrip }};
-		{%- endif %}
+	{%- for descrip in nonterm.grammarDescription %}
+	struct s_{{ descrip }} *_{{ descrip }};
 	{%- endfor %}
-}	t_{{ nonterm.grammarName }}{% if nonterm.derivNum > 0 %}{{ nonterm.derivNum }}{% endif -%};
-
-
-void 	*init_nonterm_{{ nonterm.grammarName }}{% if nonterm.derivNum > 0 %}{{ nonterm.derivNum }}{% endif %}() {
-	t_{{ nonterm.grammarName }}{% if nonterm.derivNum > 0 %}{{ nonterm.derivNum }}{% endif %} *new_ptr;
-
-	{% for descrip in nonterm.grammarDescription %}
-		{%- if descrip[-1] == "0" %}
-	new_ptr->_{{ descrip[:-1] }} = (t_{{ descrip[:-1]}}*)malloc(sizeof(t_{{ descrip[:-1] }}));
-		{%- else %}
-	new_ptr->_{{ descrip }} = (t_{{ descrip }}*)malloc(sizeof(t_{{ descrip }}));
-		{%- endif %}
-	{%- endfor %}
-	return (new_ptr);
-}
-
+}	t_{{ nonterm.grammarName }};
 {% endfor %}
 
 
+{% for nonterm in nonterminals %}
+void 	*init_nonterm_{{ nonterm.grammarName }} () {
+	t_{{ nonterm.grammarName }} *new_ptr;
 
-
+	new_ptr->name = strdup("{{ nonterm.stringValue }}");
+	new_ptr->metadata = (metaData *)malloc(sizeof(metaData));
+	new_ptr->error = (errormsg *)malloc(sizeof(errormsg));
+	{%- for descrip in nonterm.grammarDescription %}
+	new_ptr->_{{ descrip }} = (struct s_{{ descrip }}*)malloc(sizeof(struct s_{{ descrip }}));
+	{%- endfor %}
+	return (new_ptr);
+}
+{% endfor %}
 
 
 

@@ -16,13 +16,19 @@ def generate_grammar(grammar: str):
 	terminals, nonterminals, nonterm_list, term_list = \
 		reader.parse_grammar_file(grammar)
 
+
+	fd = open('test2.c', 'w')
+	content = str()
+
 	template = ENV.get_template("terminal_lib.jinja")
 	print(template.render(terminals=term_list))
+	content += template.render(terminals=term_list)
 
 	template = ENV.get_template("nonterminal_lib.jinja")
 	print(template.render(nonterminals=nonterm_list))
-
-	
+	content += template.render(nonterminals=nonterm_list)
+	fd.write(content)
+	fd.close()
 
 
 grammar = """whileStmt -> while openbrace condition closebrace wBody
