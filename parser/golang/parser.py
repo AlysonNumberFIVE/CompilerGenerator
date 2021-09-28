@@ -71,7 +71,7 @@ def create_existing_rules(grammar: str) -> list:
 def prefix_checker(current_list: list, all_prefixes: list):
 
 	match = False
-	print("current list is now : ", current_list)
+	#print("current list is now : ", current_list)
 	for prefix in all_prefixes:
 		flag = None
 		i = 0
@@ -86,7 +86,7 @@ def prefix_checker(current_list: list, all_prefixes: list):
 
 		if flag == True:
 			return True
-	print("False>>>>")
+	
 	return False
 
 
@@ -107,7 +107,7 @@ def reduce(current_list: list, rule_objs: object):
 				if len(sub_list) == len(tokens):
 					trigger = True
 					j = 0
-					while j < len(tokens) - 1:
+					while j < len(tokens):
 
 						if sub_list[j] != tokens[j]:
 							trigger = False
@@ -126,7 +126,21 @@ def reduce(current_list: list, rule_objs: object):
 	return current_list, False
 
 
+def check_nonterminals(current_list: list):
+	nonterminals = ["ellipse", "typeCast", "commafParamList", "fParamList","fCall", "whileStmt", "forStmt", "condition", "math", "forBody", "variable", "paramList", "param", "fStmt", "struc", "strVars"]
+	if len(current_list) == 1:
+		if current_list[0] in nonterminals:
+			return True 
+	return False
+
+
+
 def search(current_list: list, rule_objs: object) -> list:
+	print("search current_list is ", current_list)
+	
+	if check_nonterminals(current_list) is True:
+		print("current_list is ", current_list)
+		return current_list ,True
 
 	for rule in rule_objs:
 
@@ -134,11 +148,13 @@ def search(current_list: list, rule_objs: object) -> list:
 		for recipe in recipes:
 
 			tokens = recipe.split()
-			if len(current_list) == len(tokens) - 1:
+
+			if len(current_list) == len(tokens):
 				trigger = True
 				i = 0
-				while i < len(tokens) - 1:
-
+				
+				while i < len(tokens):
+					
 					if current_list[i] != tokens[i]:
 						trigger = False
 						break
@@ -173,6 +189,8 @@ def error_recovery(recovery_list: list, i: int, source_list: list):
 def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 	recovery_list: list):
 
+	scope_tags = ["openbracket", "closebracket"]
+	depth = 0
 	i = 0
 	source_list = source_code.split('\n')
 	current_list = list()
@@ -183,6 +201,16 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 	while i < len(source_list):
 		source = source_list[i].split(':')
 		current_list.append(source[1])
+		"""
+		if source[1] in scope_tags:
+			if source[1] == scope_tags[0]:
+				depth += 1
+			elif source[1] == scope_tags[1]:
+				depth -= 1
+			i += 1
+
+			continue 
+		"""
 
 		while True:
 			current_list, f = reduce(current_list, rule_objs)
@@ -192,12 +220,15 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 		recover = prefix_checker(current_list, all_prefixes)
 	
 		if recover is False:
-		
-			if source[1] in recovery_list:
-				print("Syntax error") 
+			
+			if source[1] in recovery_list and len(current_list) > 1:
+				print("Syntax error detected : ", source[0]) 
 				current_list = list()
+				print("current_list ", current_list)
+				print("recover is ", recover)
 				i += 1
-				continue 
+				continue
+
 
 
 
@@ -205,62 +236,189 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 		if f == True:
 			for r in rule:
+				print('depth ', depth)
 				print("r is ", r)
 
 			#curr_grammar = Node(source[0], source[1])
 
 			current_list = list()
+			print("current_list ", current_list)
+			print("recover is ", recover)
+
+
+
 	
 
 		i += 1
 
 
-grammar = """whileStmt -> while openbrace condition closebrace wBody
-forStmt -> for openbrace assign semicolon condition semicolon math closebrace forBody
-variable -> var ID equ LITERAL fBody | var ID equ ID fBody | var param fBody |ID equ LITERAL fBody 
+grammar = """whileStmt -> while openbrace condition closebrace
+forStmt -> for openbrace variable SEMICOLON condition SEMICOLON math closebrace | for condition | for openbrace closebrace
+variable -> var ID equ LITERAL | var ID equ ID | var param | ID equ LITERAL 
 condition -> CONDITIONAL
 math -> MATH
 forBody -> openbracket fBody closebracket
-assign -> variable equ LITERAL fBody
-param -> ID DATATYPE
-commaParamList -> COMMA ID DATATYPE
-paramList -> param commaParamList
-fStmt -> func ID openbrace paramList closebrace fBody	
-fBody -> openbracket wBody closebracket | openbracket forStmt closebracket | openbracket whileStmt closebracket | openbracket closebracket
-wBody -> variable"""
+assign -> variable equ LITERAL
+ellipse -> DOT DOT DOT 
+param -> ID DATATYPE | ID openblock closeblock DATATYPE	| ellipse ID DATATYPE
+commaParamList -> COMMA param
+paramList ->  paramList commaParamList | param commaParamList
+fStmt -> func ID openbrace paramList closebrace	
+fCall -> ID openbrace fParamList | ID openbrace ID fParamList | ID openbrace LITERAL fParamList | ID DOT ID openbrace fParamList | ID DOT ID openbrace ID fParamList | ID DOT ID openbrace LITERAL fParamList
+fParamList -> COMMA ID closebrace | COMMA ID fParamList | COMMA LITERAL fParamList | COMMA LITERAL closebrace | closebrace
+struc -> type ID struct openbracket strVars closebracket | type ID struct openbracket param closebracket
+strVars -> param param | strVars param
+typeCast -> DATATYPE openbrace ID closebrace | DATATYPE openbrace LITERAL closebrace
+fBody -> openbracket wBody closebracket | openbracket forStmt closebracket | openbracket whileStmt closebracket | openbracket closebracket"""
 
-recovery_list = ["func", "var", "while", "for", "openbracket"]
 
+recovery_list = ["func", "var", "for", "while"]
+eof_list = ["closebracket"]
 
 """
-var hello = "hello"
+Bastard Go - by AlysonSomethingOrOther
 
-func main(argc int, argv []string)
-{
-	var hell string
+func print(...opts []string) {
+	unistd.write(1, "Hello World", 12)
+
 }
 
+type test struct {
+	item1 string
+	item2 int
+}
+
+var hello = "hello"
+
+func main(argc int, argv []string, third float, fourth []int)
+{
+	var test string
+	
+	print(test1, test2, test2, "test4")
+
+	type test struct {
+		item1 string
+		item2 int
+	}
+	var t int
+
+	for () {
+		print("INFINITE LOOP")
+	}
+
+	for (i = 0; i < 42; i++) {
+		print()
+	}
+}
 """
-source = """var:var
+source = """type:type
+test:ID
+struct:struct
+{:openbracket
+item1:ID
+string:DATATYPE
+item2:ID
+int:DATATYPE
+item3:ID
+int:DATATYPE
+item4:ID
+string:DATATYPE
+}:closebracket
+var:var
 hello:ID
 =:equ
 "hello":LITERAL
 func:func
 main:ID
-):closebrace
+(:openbrace
 argc:ID
 int:DATATYPE
 ,:COMMA
 argv:ID
-[]string:DATATYPE
-):closebrace
-{:openbracket
-var:var
-{:openbracket
-}:closebracket
-hell:ID
+[:openblock
+]:closeblock
 string:DATATYPE
-}:closebracket"""
+,:COMMA
+third:ID
+float:DATATYPE
+,:COMMA
+fourth:ID
+[]int:DATATYPE
+):closebrace
+var:var
+test:ID
+string:DATATYPE
+print:ID
+(:openbrace
+):closebrace
+var:var
+x:ID
+int:DATATYPE
+print2:ID
+(:openbrace
+x:ID
+,:COMMA
+y:ID
+,:COMMA
+"LITERAL":LITERAL
+):closebrace
+var:var
+test:ID
+int:DATATYPE
+type:type
+test:ID
+struct:struct
+{:openbracket
+item1:ID
+string:DATATYPE
+item2:ID
+int:DATATYPE
+var:var
+item4:ID
+int:DATATYPE
+}:closebracket
+var:var
+t:ID
+int:DATATYPE
+for:for
+(:openbrace
+):closebrace
+print:ID
+(:openbrace
+"INFINITE LOOP":LITERAL
+):closebrace
+int:DATATYPE
+(:openbrace
+"42":LITERAL
+):closebrace
+for:for
+(:openbrace
+i:ID
+=:equ
+0:LITERAL
+;:SEMICOLON
+i<42:condition
+;:SEMICOLON
+i++:math
+):closebrace
+print:ID
+(:openbrace
+):closebrace"""
+
+"""for:for
+(:openbrace
+var:var
+i:ID
+=:equ
+0:LITERAL
+;:SEMICOLON
+i<42:condition
+;:SEMICOLON
+i++:math
+):closebrace
+print:ID
+(:openbrace
+):closebrace"""
 
 rule_objs = create_grammar(grammar)
 
