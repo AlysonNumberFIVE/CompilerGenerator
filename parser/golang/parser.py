@@ -201,26 +201,28 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 	while i < len(source_list):
 		source = source_list[i].split(':')
 		current_list.append(source[1])
-		"""
-		if source[1] in scope_tags:
+
+		if (len(current_list) == 1 and source[1] in scope_tags):
 			if source[1] == scope_tags[0]:
 				depth += 1
 			elif source[1] == scope_tags[1]:
 				depth -= 1
 			i += 1
-
+			current_list = list()
 			continue 
-		"""
 
 		while True:
 			current_list, f = reduce(current_list, rule_objs)
 			if f is False:
 				break
 
+
+			
 		recover = prefix_checker(current_list, all_prefixes)
 	
+
 		if recover is False:
-			
+				
 			if source[1] in recovery_list and len(current_list) > 1:
 				print("Syntax error detected : ", source[0]) 
 				current_list = list()
@@ -230,9 +232,8 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 				continue
 
 
-
-
 		rule, f = search(current_list, rule_objs)
+
 
 		if f == True:
 			for r in rule:
@@ -345,6 +346,7 @@ float:DATATYPE
 fourth:ID
 []int:DATATYPE
 ):closebrace
+{:openbracket
 var:var
 test:ID
 string:DATATYPE
@@ -373,7 +375,6 @@ item1:ID
 string:DATATYPE
 item2:ID
 int:DATATYPE
-var:var
 item4:ID
 int:DATATYPE
 }:closebracket
@@ -403,22 +404,21 @@ i++:math
 ):closebrace
 print:ID
 (:openbrace
-):closebrace"""
-
-"""for:for
-(:openbrace
-var:var
-i:ID
-=:equ
-0:LITERAL
-;:SEMICOLON
-i<42:condition
-;:SEMICOLON
-i++:math
 ):closebrace
-print:ID
-(:openbrace
-):closebrace"""
+}:closebracket"""
+"""type:type
+test:ID
+struct:struct
+{:openbracket
+item1:ID
+string:DATATYPE
+item2:ID
+int:DATATYPE
+item3:ID
+int:DATATYPE
+item4:ID
+string:DATATYPE
+}:closebracket"""
 
 rule_objs = create_grammar(grammar)
 
