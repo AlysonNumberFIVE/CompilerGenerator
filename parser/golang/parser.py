@@ -73,10 +73,10 @@ def prefix_checker(current_list: list, all_prefixes: list):
 	match = False
 	#print("current list is now : ", current_list)
 	for prefix in all_prefixes:
-		flag = None
+		flag = True
 		i = 0
 		_prefix = prefix.split()
-	
+	#	print("prefix is ", _prefix, " and current_list is ", current_list)
 		while i < len(current_list) and i < len(_prefix):	
 			#print('curr is ', current_list[i], ' and prefix is ',_prefix[i])
 			
@@ -127,12 +127,11 @@ def reduce(current_list: list, rule_objs: object):
 
 
 def check_nonterminals(current_list: list):
-	nonterminals = ["ellipse", "typeCast", "commafParamList", "fParamList","fCall", "whileStmt", "forStmt", "condition", "math", "forBody", "variable", "paramList", "param", "fStmt", "struc", "strVars"]
+	nonterminals = ["mapping", "mapAssign", "ptrDeref", "deref", "ellipse", "typeCast", "commafParamList", "fParamList","fCall", "whileStmt", "forStmt", "condition", "math", "forBody", "variable", "paramList", "param", "fStmt", "struc", "strVars"]
 	if len(current_list) == 1:
 		if current_list[0] in nonterminals:
 			return True 
 	return False
-
 
 
 def search(current_list: list, rule_objs: object) -> list:
@@ -162,7 +161,7 @@ def search(current_list: list, rule_objs: object) -> list:
 					i += 1
 				if trigger == False:
 					continue 
-				print('True')
+			
 				return tokens, True
 
 	return [], False
@@ -185,6 +184,24 @@ def error_recovery(recovery_list: list, i: int, source_list: list):
 
 	return i, False
 
+def lookahead(current_list: list, next_token: str, all_prefixes: list):
+
+	current_list.append(next_token)
+	print(current_list)
+	if prefix_checker(current_list, all_prefixes) is True:
+		return False
+	return True
+
+
+def save_nonterminals(grammar: str):
+
+	nonterminals = list()
+	lines = grammar.split("\n")
+	for line in lines:
+		production_rule	= line.split("->")
+		nonterminals.append(production_rule[0].strip())
+	print(">> ", nonterminals)
+	return nonterminals
 
 def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 	recovery_list: list):
@@ -192,16 +209,18 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 	scope_tags = ["openbracket", "closebracket"]
 	depth = 0
 	i = 0
+	source_tokens = list()
 	source_list = source_code.split('\n')
 	current_list = list()
-	curr_grammar = None
+	curr_grammar = list()
 	all_prefixes = create_existing_rules(grammar)
 	recovery = True
 
 	while i < len(source_list):
 		source = source_list[i].split(':')
 		current_list.append(source[1])
-
+		source_tokens.append(source[0])
+	
 		if (len(current_list) == 1 and source[1] in scope_tags):
 			if source[1] == scope_tags[0]:
 				depth += 1
@@ -219,7 +238,7 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 			
 		recover = prefix_checker(current_list, all_prefixes)
-	
+		
 
 		if recover is False:
 				
@@ -233,39 +252,51 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 
 		rule, f = search(current_list, rule_objs)
+		#print(source_tokens)
+
+		if f == True and i + 1 < len(source_list):
+			source = source_list[i + 1].split(":")
+			if lookahead(current_list, source[1], all_prefixes) is False:
+				f = False
+				current_list.pop()				
+				i += 1
+				continue
 
 
 		if f == True:
+			print("f is ", f)
 			for r in rule:
+
 				print('depth ', depth)
 				print("r is ", r)
-
-			#curr_grammar = Node(source[0], source[1])
-
+			print(source_tokens)
+			source_tokens = list()
+			curr_grammar.append(r)
 			current_list = list()
 			print("current_list ", current_list)
 			print("recover is ", recover)
 
-
-
-	
-
 		i += 1
+
+	return curr_grammar
 
 
 grammar = """whileStmt -> while openbrace condition closebrace
 forStmt -> for openbrace variable SEMICOLON condition SEMICOLON math closebrace | for condition | for openbrace closebrace
-variable -> var ID equ LITERAL | var ID equ ID | var param | ID equ LITERAL 
+variable -> var ID equ LITERAL | var ID equ ID | var param | ID equ LITERAL
+deref -> ID DOT ID
 condition -> CONDITIONAL
 math -> MATH
+ptrDeref -> openbrace ID STAR ID closebrace
 forBody -> openbracket fBody closebracket
 assign -> variable equ LITERAL
-ellipse -> DOT DOT DOT 
+mapping -> map openblock ID closeblock DATATYPE | map openblock DATATYPE closeblock DATATYPE
+ellipse -> DOT DOT DOT
 param -> ID DATATYPE | ID openblock closeblock DATATYPE	| ellipse ID DATATYPE
 commaParamList -> COMMA param
 paramList ->  paramList commaParamList | param commaParamList
-fStmt -> func ID openbrace paramList closebrace	
-fCall -> ID openbrace fParamList | ID openbrace ID fParamList | ID openbrace LITERAL fParamList | ID DOT ID openbrace fParamList | ID DOT ID openbrace ID fParamList | ID DOT ID openbrace LITERAL fParamList
+fStmt -> func ID openbrace paramList closebrace	| func ID openbrace param closebrace | func ptrDeref ID openbrace closebrace
+fCall -> ID openbrace fParamList | ID openbrace ID fParamList | ID openbrace LITERAL fParamList | deref openbrace fParamList | deref openbrace ID fParamList | deref openbrace LITERAL fParamList
 fParamList -> COMMA ID closebrace | COMMA ID fParamList | COMMA LITERAL fParamList | COMMA LITERAL closebrace | closebrace
 struc -> type ID struct openbracket strVars closebracket | type ID struct openbracket param closebracket
 strVars -> param param | strVars param
@@ -279,14 +310,17 @@ eof_list = ["closebracket"]
 """
 Bastard Go - by AlysonSomethingOrOther
 
-func print(...opts []string) {
+func print(...opts []string, value int) {
 	unistd.write(1, "Hello World", 12)
-
 }
 
 type test struct {
 	item1 string
 	item2 int
+}
+
+func (s * test)printout() {
+	print(s.string)
 }
 
 var hello = "hello"
@@ -312,7 +346,31 @@ func main(argc int, argv []string, third float, fourth []int)
 	}
 }
 """
-source = """type:type
+source = """func:func
+print:ID
+(:openbrace
+.:DOT
+.:DOT
+.:DOT
+value:ID
+string:DATATYPE
+,:COMMA
+value:ID
+int:DATATYPE
+):closebrace
+{:openbracket
+unistd:ID
+.:DOT
+write:ID
+(:openbrace
+1:LITERAL
+,:COMMA
+"Hello":LITERAL
+,:COMMA
+length:ID
+):closebrace
+}:closebracket
+type:type
 test:ID
 struct:struct
 {:openbracket
@@ -324,6 +382,17 @@ item3:ID
 int:DATATYPE
 item4:ID
 string:DATATYPE
+}:closebracket
+func:func
+(:openbrace
+s:ID
+*:STAR
+test:ID
+):closebrace
+printout:ID
+(:openbrace
+):closebrace
+{:openbracket
 }:closebracket
 var:var
 hello:ID
@@ -406,27 +475,27 @@ print:ID
 (:openbrace
 ):closebrace
 }:closebracket"""
-"""type:type
-test:ID
-struct:struct
-{:openbracket
-item1:ID
-string:DATATYPE
-item2:ID
-int:DATATYPE
-item3:ID
-int:DATATYPE
-item4:ID
-string:DATATYPE
-}:closebracket"""
 
+"""s:ID
+.:DOT
+string:ID
+unistd:ID
+.:DOT
+write:ID
+(:openbrace
+):closebrace"""
+
+
+save_nonterminals(grammar)
+
+"""
 rule_objs = create_grammar(grammar)
 
 all_rules = create_existing_rules(grammar)
 
-source_code_scanner(source, rule_objs, grammar, recovery_list)
-
-
+tokens = source_code_scanner(source, rule_objs, grammar, recovery_list)
+print(tokens)
+"""
 
 
 
