@@ -127,7 +127,7 @@ def reduce(current_list: list, rule_objs: object):
 
 
 def check_nonterminals(current_list: list):
-	nonterminals = ["mapping", "mapAssign", "ptrDeref", "deref", "ellipse", "typeCast", "commafParamList", "fParamList","fCall", "whileStmt", "forStmt", "condition", "math", "forBody", "variable", "paramList", "param", "fStmt", "struc", "strVars"]
+	nonterminals = ["mappingAssign", "dictionAssign", "mapping", "mapAssign", "ptrDeref", "deref", "ellipse", "typeCast", "commafParamList", "fParamList","fCall", "whileStmt", "forStmt", "condition", "math", "forBody", "variable", "paramList", "param", "fStmt", "struc", "strVars"]
 	if len(current_list) == 1:
 		if current_list[0] in nonterminals:
 			return True 
@@ -283,13 +283,15 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 grammar = """whileStmt -> while openbrace condition closebrace
 forStmt -> for openbrace variable SEMICOLON condition SEMICOLON math closebrace | for condition | for openbrace closebrace
-variable -> var ID equ LITERAL | var ID equ ID | var param | ID equ LITERAL
+variable -> var ID equ LITERAL | var ID equ ID | var param | ID equ LITERAL | var ID equ mapping | ID equ mappingAssign
 deref -> ID DOT ID
 condition -> CONDITIONAL
 math -> MATH
 ptrDeref -> openbrace ID STAR ID closebrace
 forBody -> openbracket fBody closebracket
 assign -> variable equ LITERAL
+dictionAssign -> ID COLON ID COMMA | ID COLON LITERAL COMMA | ID COLON mappingAssign COMMA |dictionAssign COMMA | dictionAssign ID COLON LITERAL | dictionAssign dictionAssign
+mappingAssign -> openbracket dictionAssign closebracket | openbracket closebracket
 mapping -> map openblock ID closeblock DATATYPE | map openblock DATATYPE closeblock DATATYPE
 ellipse -> DOT DOT DOT
 param -> ID DATATYPE | ID openblock closeblock DATATYPE	| ellipse ID DATATYPE
@@ -300,15 +302,27 @@ fCall -> ID openbrace fParamList | ID openbrace ID fParamList | ID openbrace LIT
 fParamList -> COMMA ID closebrace | COMMA ID fParamList | COMMA LITERAL fParamList | COMMA LITERAL closebrace | closebrace
 struc -> type ID struct openbracket strVars closebracket | type ID struct openbracket param closebracket
 strVars -> param param | strVars param
-typeCast -> DATATYPE openbrace ID closebrace | DATATYPE openbrace LITERAL closebrace
-fBody -> openbracket wBody closebracket | openbracket forStmt closebracket | openbracket whileStmt closebracket | openbracket closebracket"""
-
+typeCast -> DATATYPE openbrace ID closebrace | DATATYPE openbrace LITERAL closebrace"""
 
 recovery_list = ["func", "var", "for", "while"]
 eof_list = ["closebracket"]
 
 """
 Bastard Go - by AlysonSomethingOrOther
+
+var mapping = map[string]int
+
+mapping = {
+	value: id,
+	value2: "HELLO",
+	subdict: {
+		data: "string",
+		data2: {
+			value: "STRING",
+		},
+	},
+	y: 42,
+}
 
 func print(...opts []string, value int) {
 	unistd.write(1, "Hello World", 12)
@@ -346,7 +360,49 @@ func main(argc int, argv []string, third float, fourth []int)
 	}
 }
 """
-source = """func:func
+source = """var:var
+mapping:ID
+=:equ
+map:map
+[:openblock
+string:DATATYPE
+]:closeblock
+int:DATATYPE
+mapping:ID
+=:equ
+{:openbracket
+value:ID
+;:COLON
+id:ID
+,:COMMA
+value2:ID
+;:COLON
+"HELLO":LITERAL
+,:COMMA
+subdict:ID
+;:COLON
+{:openbracket
+data:ID
+;:COLON
+"string":LITERAL
+,:COMMA
+data2:ID
+;:COLON
+{:openbracket
+value:ID
+;:COLON
+"STRING":LITERAL
+,:COMMA
+}:closebracket
+,:COMMA
+}:closebracket
+:COMMA
+y:ID
+;:COLON
+42:LITERAL
+,:COMMA
+}:closebracket
+func:func
 print:ID
 (:openbrace
 .:DOT
@@ -476,26 +532,26 @@ print:ID
 ):closebrace
 }:closebracket"""
 
-"""s:ID
-.:DOT
-string:ID
-unistd:ID
-.:DOT
-write:ID
-(:openbrace
-):closebrace"""
+source="""1:LITERAL
+*:MULT
+2:LITERAL
++:PLUS
+4:LITERAL
+*:MULT
+8:LITERAL"""
+
 
 
 save_nonterminals(grammar)
 
-"""
+
 rule_objs = create_grammar(grammar)
 
 all_rules = create_existing_rules(grammar)
 
 tokens = source_code_scanner(source, rule_objs, grammar, recovery_list)
 print(tokens)
-"""
+
 
 
 
