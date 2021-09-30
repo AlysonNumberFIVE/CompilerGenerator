@@ -29,7 +29,6 @@ class Node:
 		self.recipe = recipe
 
 
-
 def create_grammar(grammar: str):
 	rule_objs = list()
 
@@ -71,14 +70,11 @@ def create_existing_rules(grammar: str) -> list:
 def prefix_checker(current_list: list, all_prefixes: list):
 
 	match = False
-	#print("current list is now : ", current_list)
 	for prefix in all_prefixes:
 		flag = True
 		i = 0
 		_prefix = prefix.split()
-	#	print("prefix is ", _prefix, " and current_list is ", current_list)
 		while i < len(current_list) and i < len(_prefix):	
-			#print('curr is ', current_list[i], ' and prefix is ',_prefix[i])
 			
 			if current_list[i] != _prefix[i]:
 				flag = False
@@ -172,7 +168,6 @@ def error_recovery(recovery_list: list, i: int, source_list: list):
 
 	while i < len(source_list):
 
-		print("source_Code is ", source_list[i])
 		source = source_list[i].split(":")
 		if source[0] in recovery_list:
 			flag = True
@@ -183,6 +178,7 @@ def error_recovery(recovery_list: list, i: int, source_list: list):
 		return i, True
 
 	return i, False
+
 
 def lookahead(current_list: list, next_token: str, all_prefixes: list):
 
@@ -202,6 +198,7 @@ def save_nonterminals(grammar: str):
 		nonterminals.append(production_rule[0].strip())
 	print(">> ", nonterminals)
 	return nonterminals
+
 
 def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 	recovery_list: list):
@@ -252,7 +249,6 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 
 		rule, f = search(current_list, rule_objs)
-		#print(source_tokens)
 
 		if f == True and i + 1 < len(source_list):
 			source = source_list[i + 1].split(":")
@@ -532,7 +528,7 @@ print:ID
 ):closebrace
 }:closebracket"""
 
-source="""1:LITERAL
+"""1:LITERAL
 *:MULT
 2:LITERAL
 +:PLUS
