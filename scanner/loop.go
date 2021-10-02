@@ -108,6 +108,7 @@ func singleToken() {
 			break
 		}
 	}
+
 	stck.Clear()
 	if scanDelimList(currTok.String()) == true {
 		stck.Push(index, currTok.String())

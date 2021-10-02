@@ -2,6 +2,7 @@
 package main
 
 import(
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -140,15 +141,29 @@ func unpackSpec(config string) {
 	setupTokens(configs[2])
 }
 
+// cmdFlags sets up the config from the command line.
+func cmdFlags() string {
+	configFile := flag.String("config", "specfiles\\c.spec", "The config file that points to a spec to use")
+
+	flag.Parse()
+	fmt.Printf("*configFile is %s|", *configFile)
+	return *configFile
+}
+
 // initConfig
 func initConfig() string {
 	var thisConfig []string
+
+	if len(os.Args) > 1 && strings.HasPrefix(os.Args[1], "-") {
+		return cmdFlags()
+	}
 
 	content, err := ioutil.ReadFile("config")
 	if err != nil {
 		fmt.Println("Error : missing config file")
 		os.Exit(2)
 	}
+
 	options := strings.Split(string(content), newline)
 	for _, option := range options {
 		thisConfig = strings.Split(option, ":")
@@ -190,18 +205,13 @@ func main() {
 	config := readFile(configFile)
 
 	unpackSpec(config)
-	
+
+	if len(os.Args) == 1 {
+		fmt.Println("Error: No input source files provided")
+		fmt.Println("Usage: compiler [source file(s)]")
+		fmt.Println("Note: multi-file support coming soon")
+		os.Exit(1)
+	}
 	scan(os.Args[1])
 }
-
-
-
-
-
-
-
-
-
-
-
 
