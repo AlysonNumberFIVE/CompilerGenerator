@@ -1,0 +1,295 @@
+{{
+    "type": "variable",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "var",
+        "mapping",
+        "=",
+        "map",
+        "[",
+        "string",
+        "]",
+        "int"
+    ]
+},
+{
+    "type": "variable",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "mapping",
+        "=",
+        "{",
+        "value",
+        ";",
+        "id",
+        ",",
+        "value2",
+        ";",
+        "\"HELLO\"",
+        ",",
+        "subdict",
+        ";",
+        "{",
+        "data",
+        ";",
+        "\"string\"",
+        ",",
+        "data2",
+        ";",
+        "{",
+        "value",
+        ";",
+        "\"STRING\"",
+        ",",
+        "}",
+        ",",
+        "}",
+        "",
+        "y",
+        ";",
+        "42",
+        ",",
+        "}"
+    ]
+},
+{
+    "type": "fStmt",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "func",
+        "print",
+        "(",
+        ".",
+        ".",
+        ".",
+        "value",
+        "string",
+        ",",
+        "value",
+        "int",
+        ")"
+    ]
+},
+{
+    "type": "fCall",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "unistd",
+        ".",
+        "write",
+        "(",
+        "1",
+        ",",
+        "\"Hello\"",
+        ",",
+        "length",
+        ")"
+    ]
+},
+{
+    "type": "struc",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "type",
+        "test",
+        "struct",
+        "{",
+        "item1",
+        "string",
+        "item2",
+        "int",
+        "item3",
+        "int",
+        "item4",
+        "string",
+        "}"
+    ]
+},
+{
+    "type": "fStmt",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "func",
+        "(",
+        "s",
+        "*",
+        "test",
+        ")",
+        "printout",
+        "(",
+        ")"
+    ]
+},
+{
+    "type": "variable",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "var",
+        "hello",
+        "=",
+        "\"hello\""
+    ]
+},
+{
+    "type": "fStmt",
+    "scope": "",
+    "depth": 0,
+    "recipe": [
+        "func",
+        "main",
+        "(",
+        "argc",
+        "int",
+        ",",
+        "argv",
+        "[",
+        "]",
+        "string",
+        ",",
+        "third",
+        "float",
+        ",",
+        "fourth",
+        "[]int",
+        ")"
+    ]
+},
+{
+    "type": "variable",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "var",
+        "test",
+        "string"
+    ]
+},
+{
+    "type": "fCall",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "print",
+        "(",
+        ")"
+    ]
+},
+{
+    "type": "variable",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "var",
+        "x",
+        "int"
+    ]
+},
+{
+    "type": "fCall",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "print2",
+        "(",
+        "x",
+        ",",
+        "y",
+        ",",
+        "\"LITERAL\"",
+        ")"
+    ]
+},
+{
+    "type": "variable",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "var",
+        "test",
+        "int"
+    ]
+},
+{
+    "type": "struc",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "type",
+        "test",
+        "struct",
+        "{",
+        "item1",
+        "string",
+        "item2",
+        "int",
+        "item4",
+        "int",
+        "}"
+    ]
+},
+{
+    "type": "variable",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "var",
+        "t",
+        "int"
+    ]
+},
+{
+    "type": "forStmt",
+    "scope": "fStmt",
+    "depth": 1,
+    "recipe": [
+        "for",
+        "(",
+        ")"
+    ]
+},
+{
+    "type": "fCall",
+    "scope": "forStmt",
+    "depth": 2,
+    "recipe": [
+        "print",
+        "(",
+        "\"INFINITE LOOP\"",
+        ")"
+    ]
+},
+{
+    "type": "typeCast",
+    "scope": "forStmt",
+    "depth": 1,
+    "recipe": [
+        "int",
+        "(",
+        "\"42\"",
+        ")"
+    ]
+},
+{
+    "type": "forStmt",
+    "scope": "forStmt",
+    "depth": 1,
+    "recipe": [
+        "for",
+        "(",
+        "i",
+        "=",
+        "0",
+        ";",
+        "i<42",
+        ";",
+        "i++",
+        ")"
+    ]
+}}

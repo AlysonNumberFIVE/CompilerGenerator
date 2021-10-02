@@ -251,8 +251,8 @@ def source_code_scanner(source_code: str, rule_objs: object, all_prefixes: list,
 
 		source = source_list[i].split(':')
 		current_list.append(source[1])
-		source_tokens.append(source[0])
-	
+		source_tokens.append(source[0])	
+
 		if (len(current_list) == 1 and source[1] in scope_tags):
 			if source[1] == scope_tags[0]:
 				sblock = prev
@@ -262,6 +262,7 @@ def source_code_scanner(source_code: str, rule_objs: object, all_prefixes: list,
 				sblock = scope_list.pop()
 				depth -= 1
 			i += 1
+			source_tokens = list()
 			current_list = list()
 			continue 
 	
