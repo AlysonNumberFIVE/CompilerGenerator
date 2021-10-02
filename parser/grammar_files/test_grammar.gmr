@@ -1,6 +1,4 @@
 
-%% 
-
 # This section is for the language's grammar
 
 whileStmt 		-> while openbrace condition closebrace

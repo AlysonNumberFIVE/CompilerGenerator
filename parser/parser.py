@@ -1,5 +1,5 @@
 
-
+import read
 
 class RuleObject:
 
@@ -47,6 +47,9 @@ def create_grammar(grammar: str):
 
 		rule_objs.append(obj)
 		obj.print()
+
+	for objs in rule_objs:
+		print(objs.recipe)
 
 	return rule_objs
 
@@ -122,18 +125,19 @@ def reduce(current_list: list, rule_objs: object):
 	return current_list, False
 
 
-def check_nonterminals(current_list: list):
-	nonterminals = ["mappingAssign", "dictionAssign", "mapping", "mapAssign", "ptrDeref", "deref", "ellipse", "typeCast", "commafParamList", "fParamList","fCall", "whileStmt", "forStmt", "condition", "math", "forBody", "variable", "paramList", "param", "fStmt", "struc", "strVars"]
+def check_nonterminals(current_list: list, nonterminals: list):
+
 	if len(current_list) == 1:
 		if current_list[0] in nonterminals:
 			return True 
 	return False
 
 
-def search(current_list: list, rule_objs: object) -> list:
+def search(current_list: list, rule_objs: object,
+		nonterminals: list) -> list:
 	print("search current_list is ", current_list)
 	
-	if check_nonterminals(current_list) is True:
+	if check_nonterminals(current_list, nonterminals) is True:
 		print("current_list is ", current_list)
 		return current_list ,True
 
@@ -201,7 +205,7 @@ def save_nonterminals(grammar: str):
 
 
 def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
-	recovery_list: list):
+	recovery_list: list, scope_tags: list, nonterminals: list):
 
 	scope_tags = ["openbracket", "closebracket"]
 	depth = 0
@@ -248,7 +252,7 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 				continue
 
 
-		rule, f = search(current_list, rule_objs)
+		rule, f = search(current_list, rule_objs, nonterminals)
 
 		if f == True and i + 1 < len(source_list):
 			source = source_list[i + 1].split(":")
@@ -276,6 +280,8 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 	return curr_grammar
 
+
+	
 
 grammar = """whileStmt -> while openbrace condition closebrace
 forStmt -> for openbrace variable SEMICOLON condition SEMICOLON math closebrace | for condition | for openbrace closebrace
@@ -535,18 +541,21 @@ print:ID
 4:LITERAL
 *:MULT
 8:LITERAL"""
+source = """var:VAR
+i:ID
+=:EQU
+"hello world":LITERAL
+i:ID
+:=:equ_assign
+42:LITERAL"""
 
 
 
-save_nonterminals(grammar)
-
-
-rule_objs = create_grammar(grammar)
-
-all_rules = create_existing_rules(grammar)
-
-tokens = source_code_scanner(source, rule_objs, grammar, recovery_list)
-print(tokens)
+rule_objs, scope_tags, recovery_list, nonterminals, all_rules = \
+	read.read_grammar_file("grammar_files\\golang.gmr")
+tokens = source_code_scanner(source, rule_objs, grammar, recovery_list,
+		scope_tags, nonterminals)
+#print(tokens)
 
 
 

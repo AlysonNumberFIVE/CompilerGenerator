@@ -1,0 +1,19 @@
+
+fParam	 -> ID COMMA fParam
+		  | ID closebrace
+
+fCall 	 -> ID openbrace fParam closebrace
+
+variable -> VAR ID EQU ID 
+		  | VAR ID EQU LITERAL
+		  | VAR ID EQU fCall
+
+%%
+
+openbrace
+closebrace
+
+%%
+var
+
+
