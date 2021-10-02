@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"strconv"
 )
 
 // token is a struct for each token. line value to be preserved for multi-source file support.
@@ -13,6 +14,7 @@ type token struct {
 	line 		int
 	name		string
 	datatype	string
+	filename 	string
 }
 
 // tokenList is a list that holds all tokens in the source file.
@@ -30,18 +32,19 @@ func initTokenList() *tokenList {
 var tokens *tokenList
 
 // push token adds a token to the overall token list
-func (s *tokenList)pushToken(name string, datatype string) {
+func (s *tokenList)pushToken(name string, datatype string, line int, filename string) {
 	item := &token{
-		line: 0,
+		line: line,
 		name: name,
 		datatype: datatype,
+		filename: filename,
 	}
 	s.tList = append(s.tList, item)
 	s.height++ 
 }
 
 // addDelimToken adds tokens in the delim list to the token list
-func addDelimToken(value string, eval string) {
+func addDelimToken(value string, eval string, line int, filename string) {
 	var index int
 
 	index = 0
@@ -49,7 +52,7 @@ func addDelimToken(value string, eval string) {
 		for key, dtype := range tokenType {
 			if key == eval {
 				if evalRegex(value, key) == true {
-					tokens.pushToken(value, dtype)
+					tokens.pushToken(value, dtype, line, filename)
 					return 
 				}
 			}
@@ -59,20 +62,20 @@ func addDelimToken(value string, eval string) {
 }
 
 // addToken adds a token to the token list
-func addToken(value string, datatype string) {
+func addToken(value string, datatype string, line int, filename string) {
 	if len(datatype) > 0 && len(value) > 0 {
-		tokens.pushToken(value, datatype)
+		tokens.pushToken(value, datatype, line, filename)
 		return 
 	}
 	if _, exists := tokenType[value]; exists {
-		tokens.pushToken(value, tokenType[value])
+		tokens.pushToken(value, tokenType[value], line, filename)
 		return 
 	}
 	for _, pattern := range regexList {
 		for key, dtype := range tokenType {
 			if key == pattern {
 				if evalRegex(value, key) == true {
-					tokens.pushToken(value, dtype)
+					tokens.pushToken(value, dtype, line, filename)
 					break
 				}
 			}
@@ -106,8 +109,13 @@ func (s *tokenList)listTokens() {
 		fileBuffer.WriteString(token.name)
 		fileBuffer.WriteString(":")
 		fileBuffer.WriteString(token.datatype)
+		fileBuffer.WriteString(":")
+		fileBuffer.WriteString(strconv.Itoa(token.line))
+		fileBuffer.WriteString(":")
+		fileBuffer.WriteString(token.filename)
 		fileBuffer.WriteString("\n")
-		fmt.Printf("name : %s  type : %s\n", token.name, token.datatype)
+		fmt.Printf("name : %s  type : %s  line: %d  filename: %s\n",
+			token.name, token.datatype, token.line, token.filename)
 	}
 	writeFile(fileBuffer.String())
 }

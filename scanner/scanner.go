@@ -9,6 +9,8 @@ import(
 	"strings"
 	"os"
 	"runtime"
+
+	stack "github.com/AlysonBee/CompilerGenerator/stack"
 )
 
 var defaultVars 	map[string]string
@@ -197,14 +199,19 @@ func initGVars() {
 	}
 }
 
+func files(fileList []string) []string {
+	var allFiles []string
+
+	i := 1
+	for i < len(fileList) {
+		allFiles = append(allFiles, fileList[i])
+		i++
+	}
+
+	return allFiles
+}
+
 func main() {
-	initGVars()
-
-	configFile := initConfig()
-
-	config := readFile(configFile)
-
-	unpackSpec(config)
 
 	if len(os.Args) == 1 {
 		fmt.Println("Error: No input source files provided")
@@ -212,6 +219,21 @@ func main() {
 		fmt.Println("Note: multi-file support coming soon")
 		os.Exit(1)
 	}
-	scan(os.Args[1])
+
+	initGVars()
+
+	configFile := initConfig()
+	tokens = initTokenList()
+	stck = stack.InitStack()
+
+	config := readFile(configFile)
+	unpackSpec(config)
+
+	allFiles := files(os.Args)
+
+	for _, file := range allFiles {
+		scan(file)
+	}
+	tokens.listTokens()
 }
 

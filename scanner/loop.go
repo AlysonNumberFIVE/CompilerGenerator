@@ -11,11 +11,13 @@ import (
 	stack "github.com/AlysonBee/CompilerGenerator/stack"
 )
 
-var dval 		string
-var delim 		bool
-var content		string
-var index 		int
-var stck 		*stack.Stack
+var dval 			string
+var delim 			bool
+var content			string
+var index 			int
+var line 			int
+var currFilename 	string
+var stck 			*stack.Stack
 
 // nextChar advances the index into the source file while returning the current token
 func nextChar() string {
@@ -97,6 +99,11 @@ func singleToken() {
 			tmp, index = rollBack()
 			break 
 		}
+
+		if c == "\n" {
+			line++
+		}
+
 		currTok.WriteString(c)
 		checker = validPrefix(currTok.String())
 		if checker == 1 {
@@ -115,7 +122,7 @@ func singleToken() {
 		delim = true
 		return 
 	}
-	addToken(currTok.String(), "")
+	addToken(currTok.String(), "", line, currFilename)
 }
 
 // determinePattern determines which regex pattern findPattern falls under and
@@ -148,7 +155,7 @@ func handleDelim() {
 			break
 		}
 	}
-	addDelimToken(totalTok.String(), eval)
+	addDelimToken(totalTok.String(), eval, line, currFilename)
 	delim = false
 }
 
@@ -159,9 +166,9 @@ func initScanner(filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tokens = initTokenList()
+	currFilename = filename 
 	content = string(tmp)
-	stck = stack.InitStack()
+	line = 1
 	index = 0
 }
 
@@ -178,6 +185,5 @@ func scan(filename string) {
 			handleDelim()
 		}
 	}
-	tokens.listTokens()
 }
 
