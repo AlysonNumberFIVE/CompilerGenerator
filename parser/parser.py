@@ -1,5 +1,6 @@
 
 import read
+import json
 
 class RuleObject:
 
@@ -19,14 +20,35 @@ class RuleObject:
 				print('\t', follow)
 
 
+class Errors:
+
+	def __init__(self, error_token: str, line: int, file:str):
+		self.error_token = error_token
+		self.line = line
+		self.file = file
+
+	def string(self):
+		print("Syntax error : ", self.file,":", self.line,
+			" invalid syntax ", self.error_token) 
+
+
 class Node:
 
-	def __init__(self, name: str, _type: str, recipe: list):
-		self.name = name
+	def __init__(self, _type: str, scope:str,
+			depth: int, recipe: list):
 		self.type = _type
-		self.next = None
+		self.scope = scope
+		self.depth = depth
 
 		self.recipe = recipe
+
+	def string(self):
+		print("type   ", self.type)
+		print("scope  ", self.scope)
+		print("depth  ", self.depth)
+
+		print("recipe ", self.recipe)
+		print("\n")
 
 
 def create_grammar(grammar: str):
@@ -200,62 +222,74 @@ def save_nonterminals(grammar: str):
 	for line in lines:
 		production_rule	= line.split("->")
 		nonterminals.append(production_rule[0].strip())
-	print(">> ", nonterminals)
+
 	return nonterminals
 
 
-def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
+def source_code_scanner(source_code: str, rule_objs: object, all_prefixes: list,
 	recovery_list: list, scope_tags: list, nonterminals: list):
 
-	scope_tags = ["openbracket", "closebracket"]
+	nodes = list()
+	errors = list()
+	scope_list = list()
+	
 	depth = 0
 	i = 0
 	source_tokens = list()
 	source_list = source_code.split('\n')
 	current_list = list()
-	curr_grammar = list()
-	all_prefixes = create_existing_rules(grammar)
 	recovery = True
+	prev = str()
+	source = list()
+	sblock = str()
 
 	while i < len(source_list):
+
+		if len(source_list[i]) == 0:
+			i += 1
+			continue
+
 		source = source_list[i].split(':')
 		current_list.append(source[1])
 		source_tokens.append(source[0])
 	
 		if (len(current_list) == 1 and source[1] in scope_tags):
 			if source[1] == scope_tags[0]:
+				sblock = prev
+				scope_list.append(sblock)
 				depth += 1
 			elif source[1] == scope_tags[1]:
+				sblock = scope_list.pop()
 				depth -= 1
 			i += 1
 			current_list = list()
 			continue 
-
+	
 		while True:
 			current_list, f = reduce(current_list, rule_objs)
 			if f is False:
 				break
 
-
-			
-		recover = prefix_checker(current_list, all_prefixes)
-		
+		recover = prefix_checker(current_list, all_prefixes)		
 
 		if recover is False:
 				
-			if source[1] in recovery_list and len(current_list) > 1:
-				print("Syntax error detected : ", source[0]) 
+			if source[1] in recovery_list and len(current_list) > 1: 
+				err = Errors(
+					source[0],
+					source[2],
+					source[3]
+				)
+				errors.append(err)
 				current_list = list()
-				print("current_list ", current_list)
-				print("recover is ", recover)
 				i += 1
 				continue
-
 
 		rule, f = search(current_list, rule_objs, nonterminals)
 
 		if f == True and i + 1 < len(source_list):
 			source = source_list[i + 1].split(":")
+			prev = current_list[0]
 			if lookahead(current_list, source[1], all_prefixes) is False:
 				f = False
 				current_list.pop()				
@@ -264,302 +298,68 @@ def source_code_scanner(source_code: str, rule_objs: object, grammar: str,
 
 
 		if f == True:
-			print("f is ", f)
-			for r in rule:
 
-				print('depth ', depth)
-				print("r is ", r)
-			print(source_tokens)
+
+			if len(scope_list) == 0:
+				sblock = ""
+
+			new_node = Node(
+				current_list[0],
+				sblock,
+				depth,
+				source_tokens
+			)
+
+			nodes.append(new_node)
 			source_tokens = list()
-			curr_grammar.append(r)
 			current_list = list()
-			print("current_list ", current_list)
-			print("recover is ", recover)
 
 		i += 1
 
-	return curr_grammar
+
+	if len(current_list) > 1:
+		errors.append(
+			Errors(source[0], source[2], source[3])
+		)
+
+	if depth != 0:
+		errors.append(
+			Errors("mismatched blocks", -1, "tmp_file")
+		)
+
+	return nodes, errors
 
 
-	
+def write_json_file(tokens: list):
+	file_buffer = open("source.ast", "w")
+	file_buffer.write("{")
 
-grammar = """whileStmt -> while openbrace condition closebrace
-forStmt -> for openbrace variable SEMICOLON condition SEMICOLON math closebrace | for condition | for openbrace closebrace
-variable -> var ID equ LITERAL | var ID equ ID | var param | ID equ LITERAL | var ID equ mapping | ID equ mappingAssign
-deref -> ID DOT ID
-condition -> CONDITIONAL
-math -> MATH
-ptrDeref -> openbrace ID STAR ID closebrace
-forBody -> openbracket fBody closebracket
-assign -> variable equ LITERAL
-dictionAssign -> ID COLON ID COMMA | ID COLON LITERAL COMMA | ID COLON mappingAssign COMMA |dictionAssign COMMA | dictionAssign ID COLON LITERAL | dictionAssign dictionAssign
-mappingAssign -> openbracket dictionAssign closebracket | openbracket closebracket
-mapping -> map openblock ID closeblock DATATYPE | map openblock DATATYPE closeblock DATATYPE
-ellipse -> DOT DOT DOT
-param -> ID DATATYPE | ID openblock closeblock DATATYPE	| ellipse ID DATATYPE
-commaParamList -> COMMA param
-paramList ->  paramList commaParamList | param commaParamList
-fStmt -> func ID openbrace paramList closebrace	| func ID openbrace param closebrace | func ptrDeref ID openbrace closebrace
-fCall -> ID openbrace fParamList | ID openbrace ID fParamList | ID openbrace LITERAL fParamList | deref openbrace fParamList | deref openbrace ID fParamList | deref openbrace LITERAL fParamList
-fParamList -> COMMA ID closebrace | COMMA ID fParamList | COMMA LITERAL fParamList | COMMA LITERAL closebrace | closebrace
-struc -> type ID struct openbracket strVars closebracket | type ID struct openbracket param closebracket
-strVars -> param param | strVars param
-typeCast -> DATATYPE openbrace ID closebrace | DATATYPE openbrace LITERAL closebrace"""
+	for i, token in zip(range(0, len(tokens) - 1), tokens):
+		file_buffer.write(json.dumps(token.__dict__, indent=4))
+		if i == len(tokens) - 2:
+			break
+		file_buffer.write(",\n")
 
-recovery_list = ["func", "var", "for", "while"]
-eof_list = ["closebracket"]
-
-"""
-Bastard Go - by AlysonSomethingOrOther
-
-var mapping = map[string]int
-
-mapping = {
-	value: id,
-	value2: "HELLO",
-	subdict: {
-		data: "string",
-		data2: {
-			value: "STRING",
-		},
-	},
-	y: 42,
-}
-
-func print(...opts []string, value int) {
-	unistd.write(1, "Hello World", 12)
-}
-
-type test struct {
-	item1 string
-	item2 int
-}
-
-func (s * test)printout() {
-	print(s.string)
-}
-
-var hello = "hello"
-
-func main(argc int, argv []string, third float, fourth []int)
-{
-	var test string
-	
-	print(test1, test2, test2, "test4")
-
-	type test struct {
-		item1 string
-		item2 int
-	}
-	var t int
-
-	for () {
-		print("INFINITE LOOP")
-	}
-
-	for (i = 0; i < 42; i++) {
-		print()
-	}
-}
-"""
-source = """var:var
-mapping:ID
-=:equ
-map:map
-[:openblock
-string:DATATYPE
-]:closeblock
-int:DATATYPE
-mapping:ID
-=:equ
-{:openbracket
-value:ID
-;:COLON
-id:ID
-,:COMMA
-value2:ID
-;:COLON
-"HELLO":LITERAL
-,:COMMA
-subdict:ID
-;:COLON
-{:openbracket
-data:ID
-;:COLON
-"string":LITERAL
-,:COMMA
-data2:ID
-;:COLON
-{:openbracket
-value:ID
-;:COLON
-"STRING":LITERAL
-,:COMMA
-}:closebracket
-,:COMMA
-}:closebracket
-:COMMA
-y:ID
-;:COLON
-42:LITERAL
-,:COMMA
-}:closebracket
-func:func
-print:ID
-(:openbrace
-.:DOT
-.:DOT
-.:DOT
-value:ID
-string:DATATYPE
-,:COMMA
-value:ID
-int:DATATYPE
-):closebrace
-{:openbracket
-unistd:ID
-.:DOT
-write:ID
-(:openbrace
-1:LITERAL
-,:COMMA
-"Hello":LITERAL
-,:COMMA
-length:ID
-):closebrace
-}:closebracket
-type:type
-test:ID
-struct:struct
-{:openbracket
-item1:ID
-string:DATATYPE
-item2:ID
-int:DATATYPE
-item3:ID
-int:DATATYPE
-item4:ID
-string:DATATYPE
-}:closebracket
-func:func
-(:openbrace
-s:ID
-*:STAR
-test:ID
-):closebrace
-printout:ID
-(:openbrace
-):closebrace
-{:openbracket
-}:closebracket
-var:var
-hello:ID
-=:equ
-"hello":LITERAL
-func:func
-main:ID
-(:openbrace
-argc:ID
-int:DATATYPE
-,:COMMA
-argv:ID
-[:openblock
-]:closeblock
-string:DATATYPE
-,:COMMA
-third:ID
-float:DATATYPE
-,:COMMA
-fourth:ID
-[]int:DATATYPE
-):closebrace
-{:openbracket
-var:var
-test:ID
-string:DATATYPE
-print:ID
-(:openbrace
-):closebrace
-var:var
-x:ID
-int:DATATYPE
-print2:ID
-(:openbrace
-x:ID
-,:COMMA
-y:ID
-,:COMMA
-"LITERAL":LITERAL
-):closebrace
-var:var
-test:ID
-int:DATATYPE
-type:type
-test:ID
-struct:struct
-{:openbracket
-item1:ID
-string:DATATYPE
-item2:ID
-int:DATATYPE
-item4:ID
-int:DATATYPE
-}:closebracket
-var:var
-t:ID
-int:DATATYPE
-for:for
-(:openbrace
-):closebrace
-print:ID
-(:openbrace
-"INFINITE LOOP":LITERAL
-):closebrace
-int:DATATYPE
-(:openbrace
-"42":LITERAL
-):closebrace
-for:for
-(:openbrace
-i:ID
-=:equ
-0:LITERAL
-;:SEMICOLON
-i<42:condition
-;:SEMICOLON
-i++:math
-):closebrace
-print:ID
-(:openbrace
-):closebrace
-}:closebracket"""
-
-"""1:LITERAL
-*:MULT
-2:LITERAL
-+:PLUS
-4:LITERAL
-*:MULT
-8:LITERAL"""
-source = """var:VAR
-i:ID
-=:EQU
-"hello world":LITERAL
-i:ID
-:=:equ_assign
-42:LITERAL"""
+	file_buffer.write("}")
+	file_buffer.close()
 
 
+if __name__ == '__main__':
 
-rule_objs, scope_tags, recovery_list, nonterminals, all_rules = \
-	read.read_grammar_file("grammar_files\\golang.gmr")
-tokens = source_code_scanner(source, rule_objs, grammar, recovery_list,
+	source = read.read_file("source_files\\source1.tk")
+
+	rule_objs, scope_tags, recovery_list, nonterminals, all_rules = \
+		read.read_grammar_file("grammar_files\\test_grammar.gmr")
+
+	tokens, errors = source_code_scanner(source, rule_objs, all_rules, recovery_list,
 		scope_tags, nonterminals)
-#print(tokens)
 
+	write_json_file(tokens)
 
+	for token in tokens:
+		token.string()
 
-
-
-
+	if len(errors) > 0:
+		for err in errors:
+			err.string()
 

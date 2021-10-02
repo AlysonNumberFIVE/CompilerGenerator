@@ -79,8 +79,8 @@ typeCast 		-> DATATYPE openbrace ID closebrace
 
 # This section is for scope increment/decrement tokens. The first will incrmeent, the second will decrement
 
-openbrace
-closebrace
+openbracket
+closebracket
 
 %%
 

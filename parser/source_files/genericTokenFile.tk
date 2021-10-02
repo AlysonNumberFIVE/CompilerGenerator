@@ -1,0 +1,8 @@
+var:VAR:1:program_files\gotest.g
+i:ID:1:program_files\gotest.g
+=:EQU:1:program_files\gotest.g
+"hello world":LITERAL:1:program_files\gotest.g
+i:ID:2:program_files\gotest.g
+):OPENBRACEK:2:program_files\gotest.g
+:=:equ_assign:2:program_files\gotest.g
+42:LITERAL:2:program_files\gotest.g
