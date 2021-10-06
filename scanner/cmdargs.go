@@ -14,12 +14,14 @@ type arguments struct {
 	interpreter bool     // interperter will fire up the shell (not implemented)
 	files       []string // files are a list of the files passed into the scanner.
 	init        string   // init creates a blank spec file with Classifiers set.
+	verbose     bool     // verbose prints out the tokens
 }
 
 // initArgs initializes an empty arguments structure.
 func initArgs() *arguments {
 	return &arguments{
 		interpreter: false,
+		verbose:     false,
 	}
 }
 
@@ -73,6 +75,8 @@ func cmdArgs(args []string) *arguments {
 			if (args[i] == "--spec" || args[i] == "-s") && i+1 < len(args) {
 				argv.specfile = args[i+1]
 				i += 1
+			} else if args[i] == "-v" || args[i] == "--verbose" {
+				argv.verbose = true
 			} else if args[i] == "-h" || args[i] == "--help" {
 				help()
 			} else if (args[i] == "--init" || args[i] == "-i") && i+1 < len(args) {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -34,7 +33,7 @@ func handleASCIICode(value string) string {
 	for _, c := range value {
 		if c == '%' {
 			flag = true
-		} else if flag == true && isASCII(rune(c)) == true {
+		} else if flag && isASCII(rune(c)) {
 			checker.WriteString(string(c))
 		} else {
 			flag = false
@@ -67,7 +66,7 @@ func handleVariable(value string) string {
 			flag = false
 			toReturn.WriteString(gSymbolTable[newVal.String()])
 			newVal.Reset()
-		} else if flag == true {
+		} else if flag {
 			newVal.WriteString(string(c))
 		} else {
 			toReturn.WriteString(string(c))
@@ -78,7 +77,7 @@ func handleVariable(value string) string {
 
 // skip skips over empty commented out lines.
 func skip(segment string) bool {
-	if len(segment) == 0 || strings.HasPrefix(segment, "#") == true {
+	if len(segment) == 0 || strings.HasPrefix(segment, "#") {
 		return true
 	}
 	return false
@@ -99,7 +98,7 @@ func setupTargetList(config string, target string) {
 
 	segments := strings.Split(config, newline)
 	for _, segment := range segments {
-		if skip(segment) == true {
+		if skip(segment) {
 			continue
 		}
 		keyVal = strings.Fields(segment)
@@ -123,7 +122,7 @@ func setupTokens(config string) {
 
 	segments := strings.Split(config, newline)
 	for _, segment := range segments {
-		if skip(segment) == true {
+		if skip(segment) {
 			continue
 		}
 		keyVal = strings.Fields(segment)
@@ -140,15 +139,6 @@ func unpackSpec(config string) {
 	setupTargetList(configs[0], "regex")
 	setupTargetList(configs[1], "delim")
 	setupTokens(configs[2])
-}
-
-// cmdFlags sets up the config from the command line.
-func cmdFlags() string {
-	configFile := flag.String("config", "specfiles\\c.spec", "The config file that points to a spec to use")
-
-	flag.Parse()
-	fmt.Println("config is ", *configFile)
-	return *configFile
 }
 
 // initConfig
@@ -194,18 +184,6 @@ func initGVars() {
 	}
 }
 
-func files(fileList []string) []string {
-	var allFiles []string
-
-	i := 1
-	for i < len(fileList) {
-		allFiles = append(allFiles, fileList[i])
-		i++
-	}
-
-	return allFiles
-}
-
 func main() {
 
 	argv := cmdArgs(os.Args)
@@ -222,11 +200,13 @@ func main() {
 	tokens = initTokenList()
 	stck = stack.InitStack()
 
-	//	config = readFile(configFile)
 	unpackSpec(config)
 
 	for _, file := range argv.files {
 		scan(file)
 	}
-	tokens.listTokens()
+
+	if argv.verbose {
+		tokens.listTokens()
+	}
 }
