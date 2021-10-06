@@ -13,6 +13,7 @@ type arguments struct {
 	// the config file is used instead.
 	interpreter bool     // interperter will fire up the shell (not implemented)
 	files       []string // files are a list of the files passed into the scanner.
+	init        string   // init creates a blank spec file with Classifiers set.
 }
 
 // initArgs initializes an empty arguments structure.
@@ -23,6 +24,11 @@ func initArgs() *arguments {
 }
 
 func verifyArgs(argv *arguments) *arguments {
+	if len(argv.init) > 0 {
+		initSpecFile(argv.init)
+		os.Exit(1)
+	}
+
 	if argv.interpreter {
 		fmt.Println("Prompt not implemented")
 		if len(argv.files) > 0 {
@@ -51,11 +57,18 @@ func cmdArgs(args []string) *arguments {
 	i := 1
 	for i < len(args) {
 		if strings.HasPrefix(args[i], "-") {
+
+			// TODO: Convert this to a swtich statement.
 			if (args[i] == "--spec" || args[i] == "-s") && i+1 < len(args) {
 				argv.specfile = args[i+1]
 				i += 1
+			} else if (args[i] == "--init" || args[i] == "-i") && i+1 < len(args) {
+				argv.init = args[i+1]
+				i += 1
+				break
 			} else if args[i] == "--prompt" || args[i] == "-p" {
 				argv.interpreter = true
+				break
 			} else {
 				fmt.Println("Error: invalid flag", args[i])
 				os.Exit(1)

@@ -1,8 +1,8 @@
 
 # Classifiers
 
-alphabet 		[_a-zA-Z]
-digit 			[0-9]
+			alphabet 		[_a-zA-Z]
+		digit 			[0-9]
 number 			{digit}+
 hex				{digit}+h
 word 			{alphabet}({alphabet}|{digit})*
