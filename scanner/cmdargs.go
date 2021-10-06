@@ -29,7 +29,8 @@ func help() {
 	fmt.Println("Flags :")
 	fmt.Println("\t-s | --spec [specfile] : specify a specfile to use from the command line")
 	fmt.Println("\t-i | --init [filename] : initialize a specfile template to use (auto classifiers already set)")
-	fmt.Println("\t-p | -- prompt : Initializes an interactive shell, allowing you to test \n\ttokens from a spec you're testing (coming soon)")
+	fmt.Println("\t-p | --prompt : Initializes an interactive shell, allowing you to test \n\ttokens from a spec you're testing (coming soon)")
+	fmt.Println("\t-h | --help : print this screen.")
 	os.Exit(1)
 }
 
@@ -59,10 +60,9 @@ func verifyArgs(argv *arguments) *arguments {
 func cmdArgs(args []string) *arguments {
 	argv := initArgs()
 
-	if len(args) < 1 {
+	if len(args) < 2 {
 		fmt.Println("Error : No arguments provided")
-		fmt.Println("Usage: ./scanner [args]")
-		os.Exit(1)
+		help()
 	}
 
 	i := 1
