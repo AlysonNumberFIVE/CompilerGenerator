@@ -23,7 +23,7 @@ func initArgs() *arguments {
 }
 
 func verifyArgs(argv *arguments) *arguments {
-	if argv.interpreter == true {
+	if argv.interpreter {
 		fmt.Println("Prompt not implemented")
 		if len(argv.files) > 0 {
 			fmt.Println("Note: Cannot run file interactively")
@@ -31,18 +31,10 @@ func verifyArgs(argv *arguments) *arguments {
 		os.Exit(1)
 	}
 
-	if len(argv.specfile) == 0 {
-		argv.specfile = "config"
-	}
-
 	if len(argv.files) == 0 {
 		fmt.Println("No files inputted")
 		os.Exit(1)
 	}
-
-	fmt.Println("Arguments verified:")
-	fmt.Println("files ", argv.files)
-	fmt.Println("spec ", argv.specfile)
 	return argv
 }
 
@@ -74,9 +66,4 @@ func cmdArgs(args []string) *arguments {
 		i++
 	}
 	return verifyArgs(argv)
-}
-
-func main() {
-	argv := []string{"./scanner", "-s"}
-	cmdArgs(argv)
 }

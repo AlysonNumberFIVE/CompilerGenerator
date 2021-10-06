@@ -1,35 +1,34 @@
-
 package main
 
-import(
+import (
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strings"
 	"os"
 	"runtime"
+	"strings"
 
 	stack "github.com/AlysonBee/CompilerGenerator/stack"
 )
 
-var defaultVars 	map[string]string
-var gSymbolTable	map[string]string
-var newline 		string
-var regexList		map[string]string
-var delimList		map[string]string
-var tokenType 		map[string]string
+var defaultVars map[string]string
+var gSymbolTable map[string]string
+var newline string
+var regexList map[string]string
+var delimList map[string]string
+var tokenType map[string]string
 
 // isASCII checkes that a rune is a valid ASCII character.
 func isASCII(c rune) bool {
-	return (int(c) >= int('a') && int(c) <= int('z')) || (int(c) >= int('A') && int(c) <= int('Z'))  
+	return (int(c) >= int('a') && int(c) <= int('z')) || (int(c) >= int('A') && int(c) <= int('Z'))
 }
 
 // handlASCIICode converts tokens delimited with '%' in the config file into their
 // ASCII equivalents as \t \n aren't carried over as TABs and Newlines respectively
 func handleASCIICode(value string) string {
-	var checker		strings.Builder
-	var toReturn	strings.Builder
+	var checker strings.Builder
+	var toReturn strings.Builder
 
 	flag := false
 	for _, c := range value {
@@ -55,34 +54,34 @@ func handleASCIICode(value string) string {
 	return toReturn.String()
 }
 
-// handleVariable handles replacing variables with their contained values 
+// handleVariable handles replacing variables with their contained values
 func handleVariable(value string) string {
-    var newVal		strings.Builder
-    var toReturn	strings.Builder
+	var newVal strings.Builder
+	var toReturn strings.Builder
 
-    flag := false
-    for _, c := range value {
-        if c == '{' {
-        	flag = true
-        } else if c == '}' {
-            flag = false
-            toReturn.WriteString(gSymbolTable[newVal.String()])
-            newVal.Reset()
-        } else if flag == true {
-            newVal.WriteString(string(c))
-        } else {
-            toReturn.WriteString(string(c))
-        }
-    }
-    return toReturn.String()
+	flag := false
+	for _, c := range value {
+		if c == '{' {
+			flag = true
+		} else if c == '}' {
+			flag = false
+			toReturn.WriteString(gSymbolTable[newVal.String()])
+			newVal.Reset()
+		} else if flag == true {
+			newVal.WriteString(string(c))
+		} else {
+			toReturn.WriteString(string(c))
+		}
+	}
+	return toReturn.String()
 }
 
 // skip skips over empty commented out lines.
 func skip(segment string) bool {
 	if len(segment) == 0 || strings.HasPrefix(segment, "#") == true {
 		return true
-    }
-    return false
+	}
+	return false
 }
 
 // readFile reads the contents of the source file.
@@ -96,15 +95,15 @@ func readFile(filename string) string {
 
 // setupTargetList sets up the delim and regex tables from the spec file
 func setupTargetList(config string, target string) {
-	var keyVal		[]string
+	var keyVal []string
 
 	segments := strings.Split(config, newline)
 	for _, segment := range segments {
 		if skip(segment) == true {
-			continue 
+			continue
 		}
 		keyVal = strings.Fields(segment)
-		
+
 		keyVal[1] = handleVariable(keyVal[1])
 		if len(keyVal[1]) > 0 && keyVal[1][0] == '%' {
 			keyVal[1] = handleASCIICode(keyVal[1])
@@ -125,7 +124,7 @@ func setupTokens(config string) {
 	segments := strings.Split(config, newline)
 	for _, segment := range segments {
 		if skip(segment) == true {
-			continue 
+			continue
 		}
 		keyVal = strings.Fields(segment)
 		if len(keyVal[0]) > 1 && keyVal[0][1] == '%' {
@@ -156,10 +155,6 @@ func cmdFlags() string {
 func initConfig() string {
 	var thisConfig []string
 
-	if len(os.Args) > 1 && strings.HasPrefix(os.Args[1], "-") {
-		return cmdFlags()
-	}
-
 	content, err := ioutil.ReadFile("config")
 	if err != nil {
 		fmt.Println("Error : missing config file")
@@ -171,7 +166,7 @@ func initConfig() string {
 		thisConfig = strings.Split(option, ":")
 		if thisConfig[0] == "spec" {
 			return thisConfig[1] // code to be configured should extra config options become a thing.
-		}	
+		}
 	}
 	fmt.Println("config not parsed properly")
 	os.Exit(3)
@@ -187,7 +182,7 @@ func initGVars() {
 	delimList = make(map[string]string)
 
 	defaultVars["NEWLINE"] = "\n"
-	defaultVars["TAB"] = "\t"	
+	defaultVars["TAB"] = "\t"
 	defaultVars["PC"] = "%"
 	defaultVars["LBRC"] = "{"
 	defaultVars["RBRC"] = "}"
@@ -213,28 +208,25 @@ func files(fileList []string) []string {
 
 func main() {
 
-	if len(os.Args) == 1 {
-		fmt.Println("Error: No input source files provided")
-		fmt.Println("Usage: compiler [source file(s)]")
-		fmt.Println("Note: multi-file support coming soon")
-		os.Exit(1)
-	}
+	argv := cmdArgs(os.Args)
 
 	initGVars()
 
-	configFile := initConfig()
-	fmt.Println("configFile ", configFile)
+	var config string
+	if len(argv.specfile) == 0 {
+		config = readFile(initConfig())
+	} else {
+		config = readFile(argv.specfile)
+	}
+
 	tokens = initTokenList()
 	stck = stack.InitStack()
 
-	config := readFile(configFile)
+	//	config = readFile(configFile)
 	unpackSpec(config)
 
-	allFiles := files(os.Args)
-
-	for _, file := range allFiles {
+	for _, file := range argv.files {
 		scan(file)
 	}
 	tokens.listTokens()
 }
-
