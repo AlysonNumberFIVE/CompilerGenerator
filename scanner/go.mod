@@ -1,4 +1,4 @@
-module compiler
+module scan
 
 go 1.16
 

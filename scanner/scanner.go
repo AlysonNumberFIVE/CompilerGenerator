@@ -148,7 +148,7 @@ func cmdFlags() string {
 	configFile := flag.String("config", "specfiles\\c.spec", "The config file that points to a spec to use")
 
 	flag.Parse()
-	fmt.Printf("*configFile is %s|", *configFile)
+	fmt.Println("config is ", *configFile)
 	return *configFile
 }
 
@@ -223,6 +223,7 @@ func main() {
 	initGVars()
 
 	configFile := initConfig()
+	fmt.Println("configFile ", configFile)
 	tokens = initTokenList()
 	stck = stack.InitStack()
 
