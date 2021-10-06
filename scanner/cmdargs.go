@@ -23,6 +23,17 @@ func initArgs() *arguments {
 	}
 }
 
+func help() {
+	fmt.Println("Scanner : created by AlysonOrSomething")
+	fmt.Println("Usage : ./scan [optional Flags] [program files]")
+	fmt.Println("Flags :")
+	fmt.Println("\t-s | --spec [specfile] : specify a specfile to use from the command line")
+	fmt.Println("\t-i | --init [filename] : initialize a specfile template to use (auto classifiers already set)")
+	fmt.Println("\t-p | -- prompt : Initializes an interactive shell, allowing you to test \n\ttokens from a spec you're testing (coming soon)")
+	os.Exit(1)
+}
+
+// verifyArgs sanity checks the flags passed in by the command line,
 func verifyArgs(argv *arguments) *arguments {
 	if len(argv.init) > 0 {
 		initSpecFile(argv.init)
@@ -62,6 +73,8 @@ func cmdArgs(args []string) *arguments {
 			if (args[i] == "--spec" || args[i] == "-s") && i+1 < len(args) {
 				argv.specfile = args[i+1]
 				i += 1
+			} else if args[i] == "-h" || args[i] == "--help" {
+				help()
 			} else if (args[i] == "--init" || args[i] == "-i") && i+1 < len(args) {
 				argv.init = args[i+1]
 				i += 1
