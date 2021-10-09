@@ -1,0 +1,24 @@
+
+imprt       -> IMPORT IDENTIFIER
+
+funcDecl    -> variable OPENBRACKET CLOSEBRACKET
+            | param OPENBRACKET param CLOSEBRACKET
+
+variable    -> DATATYPE IDENTIFIER
+            | DATATYPE STAR IDENTIFIER
+
+varDecl     -> variable SEMICOLON
+
+param       -> variable 
+            | param param
+            | COMMA param
+
+ifStmt      -> if OPENBRACKET condition CLOSEBRACKE
+
+
+%% 
+
+CLOSEBRACKET
+OPENBRACE
+%%
+int

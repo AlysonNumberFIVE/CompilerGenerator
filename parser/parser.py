@@ -347,10 +347,10 @@ def write_json_file(tokens: list):
 
 if __name__ == '__main__':
 
-	source = read.read_file("source_files\\source1.tk")
+	source = read.read_file("source_files/genericTokenFile.tk")
 
 	rule_objs, scope_tags, recovery_list, nonterminals, all_rules = \
-		read.read_grammar_file("grammar_files\\test_grammar.gmr")
+		read.read_grammar_file("grammar_files/toyc.gmr")
 
 	tokens, errors = source_code_scanner(source, rule_objs, all_rules, recovery_list,
 		scope_tags, nonterminals)
