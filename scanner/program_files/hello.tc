@@ -1,0 +1,26 @@
+
+
+include unistd
+
+
+int print_argv(int argc, string *argv) 
+{
+	i = 0;
+	while (i < argc)
+	{
+		printf("Args are %s\n", argv[i]);
+		i++;
+	}	
+}
+
+
+int main(int argc, string *argv) 
+{
+	if (argc != 2)
+	{
+		printf("Usage: ./test_program [input]\n");
+		return 0;
+	}
+
+
+}

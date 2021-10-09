@@ -178,7 +178,7 @@ func initGVars() {
 	defaultVars["RBRC"] = "}"
 
 	if runtime.GOOS == "windows" {
-		newline = "\r\n"
+		newline = "\n"
 	} else {
 		newline = "\n"
 	}
@@ -189,7 +189,6 @@ func main() {
 	argv := cmdArgs(os.Args)
 
 	initGVars()
-
 	var config string
 	if len(argv.specfile) == 0 {
 		config = readFile(initConfig())
@@ -199,9 +198,7 @@ func main() {
 
 	tokens = initTokenList()
 	stck = stack.InitStack()
-
 	unpackSpec(config)
-
 	for _, file := range argv.files {
 		scan(file)
 	}

@@ -44,9 +44,33 @@ char 			'[(\')(\t)(\n)]|(.*)'
 
 # Delim tokens come here
 
+' 		{char}
+"		{string}
+//		{comment}
+/*		{mcomment}
+
 %%
 
 # And token types here
+# Below is a list of generic token types. Feel free to edit out whatever isn't needed.
+
+{word}		IDENTIFIER
+{string} 	LITERAL
+{number}	NUMBER 
++ 			PLUS
+-			MINUS
+/			DIVIDE
+* 			MULTI
+(			OPENBRACKET
+)			CLOSEBRACKET
+{lbrace}	OPENBRACE 
+{rbrace} 	CLOSEBRACE
+>> 			LSHIFT
+<< 			RSHIFT
+<<= 		LSHIFT_ASSIGN
+>>=			RSHIFT_ASSIGN
+[			OPENBLOCK
+]			CLOSEBLOCK
 `
 	// check for file's existence
 	if _, err := os.Stat(outfile); err == nil {

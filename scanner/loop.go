@@ -94,6 +94,7 @@ func singleToken() {
 	var checker int
 
 	for {
+
 		c = nextChar()
 		if len(c) == 0 {
 			tmp, index = rollBack()
@@ -179,6 +180,7 @@ func scan(filename string) {
 		if index >= len(content) {
 			break
 		}
+
 		singleToken()
 	
 		if delim == true {
